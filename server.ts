@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
@@ -14,7 +15,7 @@ import {
   runAutonomousImprovementLoop,
   generateInvestorChallenge,
   resolveInvestorChallenge,
-} from './server/geminiService.ts';
+} from './server/geminiService';
 
 dotenv.config();
 
@@ -26,12 +27,14 @@ async function startServer() {
   app.use(express.json({ limit: '20mb' }));
   app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
-  // Health Check
+  // Health Check for cloud web services and load balancers
   app.get('/api/health', (req: Request, res: Response) => {
     res.json({
       status: 'ok',
       service: 'PitchForge AI Backend',
       hasGeminiKey: Boolean(process.env.GEMINI_API_KEY),
+      nodeEnv: process.env.NODE_ENV || 'development',
+      port: PORT,
       timestamp: new Date().toISOString(),
     });
   });
@@ -194,19 +197,44 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), 'dist');
+    // Resolve dist path robustly across local build and container environments
+    const rootDist = path.join(process.cwd(), 'dist');
+    const dirnameDist = typeof __dirname !== 'undefined' ? __dirname : '';
+    const distPath = fs.existsSync(path.join(rootDist, 'index.html'))
+      ? rootDist
+      : dirnameDist && fs.existsSync(path.join(dirnameDist, 'index.html'))
+      ? dirnameDist
+      : rootDist;
+
     app.use(express.static(distPath));
     app.get('*', (req: Request, res: Response) => {
       if (req.path.startsWith('/api')) {
         return res.status(404).json({ error: 'API endpoint not found' });
       }
-      res.sendFile(path.join(distPath, 'index.html'));
+      const indexPath = path.join(distPath, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(200).send('<!DOCTYPE html><html><body><h1>PitchForge AI is starting...</h1></body></html>');
+      }
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`PitchForge AI server listening on http://0.0.0.0:${PORT}`);
+  const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log(`PitchForge AI server listening on http://0.0.0.0:${PORT} in ${process.env.NODE_ENV || 'development'} mode`);
   });
+
+  // Graceful shutdown handling for cloud web service lifecycles
+  const shutdown = () => {
+    console.log('Received shutdown signal, closing server gracefully...');
+    server.close(() => {
+      console.log('PitchForge AI server closed.');
+      process.exit(0);
+    });
+  };
+
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
 }
 
 startServer();

@@ -75,7 +75,62 @@ export const IntakeFormView: React.FC<IntakeFormViewProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+        <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+          {/* Quick Examples */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] text-zinc-400 font-medium hidden md:inline">Try Demo:</span>
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({
+                  startupName: 'HyperCourier',
+                  tagline: 'Autonomous 15-Minute Urban Cold-Chain Medical Delivery',
+                  rawIdea: 'HyperCourier provides autonomous drone-and-rover cold-chain micro-fulfillment for urgent medical samples and temperature-sensitive biologicals.',
+                  problem: 'Urgent pathology labs and clinics lose up to 18% of temperature-sensitive samples due to urban traffic bottlenecks and manual courier delays.',
+                  targetCustomer: 'Regional Hospital Networks, Independent Pathology Labs, and Decentralized Clinical Trials.',
+                  solution: 'An autonomous point-to-point cold-chain container system with real-time temperature telemetry and 15-minute SLA.',
+                  businessModel: 'B2B subscription ($2,500/mo base + $18 per guaranteed 15-minute dispatch).',
+                  stage: 'MVP / Beta',
+                  geography: 'Tier-1 Metros (US / EU)',
+                  existingTraction: '3 Hospital network LOIs signed, 450 test runs completed with 99.8% on-time integrity.',
+                  competitors: 'Legacy manual bike/van couriers (Zipline in rural, none for dense intra-hospital networks).',
+                  competitiveAdvantage: 'Proprietary FAA Part 135 waiver pipeline + sub-zero solid-state cooling patent.',
+                  revenueModel: 'SaaS Platform Fee + Per-Delivery Take Rate',
+                  teamInfo: 'Ex-Zipline Lead Robotics Engineer + Former Head of Clinical Ops at Quest Diagnostics',
+                  additionalContext: 'Seeking $2.5M Seed to deploy 40 automated hubs across Boston and Bay Area.',
+                });
+              }}
+              className="rounded-lg bg-zinc-800/80 hover:bg-zinc-750 text-amber-300 border border-amber-500/20 px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer"
+            >
+              ⚡ MedTech Drone
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({
+                  startupName: 'DataPulse AI',
+                  tagline: 'Autonomous Compliance & FinCrime Graph Intelligence',
+                  rawIdea: 'DataPulse AI analyzes cross-border banking transactions in real time using knowledge graphs and generative reasoning to eliminate 95% of false-positive AML alerts.',
+                  problem: 'Tier-1 banks spend $30B+ annually manually investigating Anti-Money Laundering alerts where 98% turn out to be harmless false alarms.',
+                  targetCustomer: 'Chief Compliance Officers, Head of FinCrime at Mid-market Banks and Fintechs.',
+                  solution: 'Graph AI copilot that auto-generates SAR (Suspicious Activity Reports) narratives and resolves benign flags in under 4 seconds.',
+                  businessModel: '$120k/yr annual license per institution + volume tiers above 1M transactions.',
+                  stage: 'Early Revenue',
+                  geography: 'North America & UK',
+                  existingTraction: '$340k ARR, 2 pilot contracts in production, 94.2% analyst time reduction verified.',
+                  competitors: 'Legacy Actimize, Unit21, manual compliance analyst teams.',
+                  competitiveAdvantage: 'Proprietary graph attention network architecture with auditable explanation trails.',
+                  revenueModel: 'Annual Enterprise SaaS License',
+                  teamInfo: 'Ex-Palantir FinCrime Architect & Ex-JPMorgan Compliance Director',
+                  additionalContext: 'Raising $3.5M Seed round to expand US commercial banking sales team.',
+                });
+              }}
+              className="rounded-lg bg-zinc-800/80 hover:bg-zinc-750 text-emerald-300 border border-emerald-500/20 px-2.5 py-1 text-[11px] font-semibold transition-all cursor-pointer"
+            >
+              ⚡ FinTech AI
+            </button>
+          </div>
+
           {/* Mode Switcher */}
           <div className="flex rounded-lg bg-zinc-900 p-1 border border-zinc-800">
             <button

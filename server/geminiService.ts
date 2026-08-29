@@ -26,21 +26,28 @@ export function getGenAIClient(): GoogleGenAI {
 }
 
 // Valid models in accordance with gemini-api skill guide
-const CANDIDATE_MODELS = ['gemini-3.7-flash', 'gemini-flash-latest', 'gemini-3.1-flash-lite'];
+const CANDIDATE_MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-3-flash-preview', 'gemini-flash-latest'];
 
 /**
- * Helper to sleep for ms
+ * Helper to race a promise against a timeout
  */
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMsg: string): Promise<T> {
+  let timer: NodeJS.Timeout;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(timeoutMsg)), timeoutMs);
+  });
+  return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timer));
+}
 
 /**
- * Robust execution wrapper: handles 503 (High Demand), 429 (Rate Limit / Quota), and transient errors
- * with fast failover to alternative models and instant fallback activation.
+ * Fast & resilient execution wrapper: calls Gemini with timeout protection and fast fallback.
+ * Uses gemini-2.5-flash as the ultra-fast primary model and bounds request duration to prevent UI freezing.
  */
 async function callGeminiWithRetry(options: {
   contents: any;
   config?: any;
   preferredModel?: string;
+  timeoutMs?: number;
 }): Promise<string> {
   const modelsToTry = options.preferredModel
     ? [options.preferredModel, ...CANDIDATE_MODELS.filter((m) => m !== options.preferredModel)]
@@ -48,59 +55,34 @@ async function callGeminiWithRetry(options: {
 
   let lastError: any = null;
   const ai = getGenAIClient();
+  const perCallTimeout = options.timeoutMs || 14000; // 14 seconds max per generation call
 
   for (const model of modelsToTry) {
-    // Up to 2 quick attempts per model
-    const maxRetries = 2;
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      try {
-        const response = await ai.models.generateContent({
+    try {
+      const response = await withTimeout(
+        ai.models.generateContent({
           model,
           contents: options.contents,
           config: options.config,
-        });
+        }),
+        perCallTimeout,
+        `Call to ${model} timed out after ${perCallTimeout}ms`
+      );
 
-        const text = response.text;
-        if (text && text.trim().length > 0) {
-          return text.trim();
-        }
-      } catch (err: any) {
-        lastError = err;
-        const errString = String(err?.message || err);
-        const isQuotaExceeded =
-          errString.includes('429') ||
-          errString.includes('quota') ||
-          errString.includes('RESOURCE_EXHAUSTED');
-
-        const isHighDemand =
-          errString.includes('503') ||
-          errString.includes('UNAVAILABLE') ||
-          errString.includes('high demand') ||
-          errString.includes('overloaded');
-
-        const isNetworkTransient =
-          errString.includes('ECONNRESET') ||
-          errString.includes('ETIMEDOUT') ||
-          errString.includes('FetchError');
-
-        // If quota is exhausted on this model, immediately move to the next model without wasting retries
-        if (isQuotaExceeded) {
-          break;
-        }
-
-        // If high demand or network glitch, do 1 fast retry with short jitter
-        if ((isHighDemand || isNetworkTransient) && attempt < maxRetries - 1) {
-          await sleep(400 + Math.random() * 300);
-          continue;
-        }
-
-        // Otherwise try next candidate model
-        break;
+      const text = response.text;
+      if (text && text.trim().length > 0) {
+        return text.trim();
       }
+    } catch (err: any) {
+      lastError = err;
+      const errString = String(err?.message || err);
+      console.warn(`Model ${model} encounter: ${errString}. Trying next candidate model...`);
+      // Proceed directly to next candidate model without lingering delays
+      continue;
     }
   }
 
-  throw lastError || new Error('All AI models unavailable. Activating structured fallback synthesis.');
+  throw lastError || new Error('AI models paused or timed out. Activating instant strategic synthesis.');
 }
 
 /**

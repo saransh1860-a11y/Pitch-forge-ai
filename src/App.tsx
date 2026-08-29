@@ -14,6 +14,7 @@ import {
   AutonomousImprovementResult,
 } from './types/pitch';
 import {
+  getStoredProjects,
   saveProject as saveLocalProject,
   deleteProject as deleteLocalProject,
 } from './services/storage';
@@ -78,36 +79,56 @@ function AppContent() {
   const [agentRevisionResult, setAgentRevisionResult] = useState<AutonomousImprovementResult | null>(null);
   const [isAgentImproving, setIsAgentImproving] = useState(false);
 
-  // Synchronize projects strictly for the authenticated user from Firestore
+  // Synchronize projects strictly for the authenticated user from Firestore with instant local fallback
   useEffect(() => {
     if (user && !isAnonymous) {
       setSyncStatus('syncing');
+      // Instantly load locally cached projects so the user doesn't experience waiting delays
+      const cached = getStoredProjects(user.uid);
+      if (cached.length > 0) {
+        setProjects(cached);
+        setActiveProject((prev) => prev || cached[0]);
+      }
+
       const unsubscribe = subscribeUserProjects(
         user.uid,
         (firestoreProjects) => {
           setSyncStatus('synced');
           // Only show pitches generated and owned by this specific authenticated account
-          setProjects(firestoreProjects);
           if (firestoreProjects.length > 0) {
+            setProjects(firestoreProjects);
             setActiveProject((prev) => {
               if (!prev) return firestoreProjects[0];
               const updated = firestoreProjects.find((p) => p.id === prev.id);
               return updated || firestoreProjects[0];
             });
+          } else if (cached.length > 0) {
+            setProjects(cached);
           } else {
+            setProjects([]);
             setActiveProject(null);
           }
         },
         (error) => {
-          console.error('Firestore user projects subscription error:', error);
+          console.warn('Firestore subscription operating in resilient local mode:', error?.message || error);
           setSyncStatus('offline');
+          const localFallback = getStoredProjects(user.uid);
+          if (localFallback.length > 0) {
+            setProjects(localFallback);
+            setActiveProject((prev) => prev || localFallback[0]);
+          }
         }
       );
       return () => unsubscribe();
     } else {
-      // When not signed in, show no private/shared projects
-      setProjects([]);
-      setActiveProject(null);
+      // Guest mode: load guest projects from local storage
+      const guestProjects = getStoredProjects(null);
+      setProjects(guestProjects);
+      if (guestProjects.length > 0) {
+        setActiveProject((prev) => prev || guestProjects[0]);
+      } else {
+        setActiveProject(null);
+      }
       setSyncStatus('idle');
     }
   }, [user, isAnonymous]);
@@ -121,8 +142,8 @@ function AppContent() {
         await saveProjectToFirestore(project, user.uid, user.email);
         setSyncStatus('synced');
       } catch (err: any) {
-        console.error('Failed to sync project to Firestore:', err);
-        setSyncStatus('error');
+        console.warn('Firestore sync will complete once connection is restored:', err?.message || err);
+        setSyncStatus('offline');
       }
     } else {
       saveLocalProject(project, null);
