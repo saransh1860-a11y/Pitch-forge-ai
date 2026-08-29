@@ -46,7 +46,7 @@ export const AnalysisCardView: React.FC<AnalysisCardViewProps> = ({
             </h1>
           </div>
           <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-            Gemini evaluated <span className="font-semibold text-white">{intake.startupName}</span> against institutional venture investment standards.
+            PitchForge AI evaluated <span className="font-semibold text-white">{intake.startupName}</span> against institutional venture investment standards.
           </p>
         </div>
 

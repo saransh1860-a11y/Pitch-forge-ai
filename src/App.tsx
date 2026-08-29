@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   StartupIntake,
   SlideData,
@@ -187,7 +188,7 @@ function AppContent() {
   // 1. Start Analysis
   const handleAnalyzeIntake = async (intake: StartupIntake) => {
     setIsLoading(true);
-    setLoadingStep('Analyzing problem, ICP & business model with Gemini...');
+    setLoadingStep('Analyzing problem, ICP & business model with PitchForge AI...');
     setErrorMessage(null);
 
     try {
@@ -223,7 +224,7 @@ function AppContent() {
   const handleGeneratePitch = async () => {
     if (!activeProject) return;
     setIsLoading(true);
-    setLoadingStep('Constructing 10-slide investor narrative with Gemini...');
+    setLoadingStep('Constructing 10-slide investor narrative with PitchForge AI...');
     setErrorMessage(null);
 
     try {
@@ -250,7 +251,7 @@ function AppContent() {
         versionId: `v1-${Date.now()}`,
         versionNumber: 1,
         createdAt: new Date().toISOString(),
-        note: 'Initial 10-Slide Generation from Gemini',
+        note: 'Initial 10-Slide Generation from PitchForge AI',
         slides,
         score,
         analysis: activeProject.analysis,
@@ -600,7 +601,7 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans antialiased selection:bg-amber-500 selection:text-zinc-950">
+    <div className="min-h-screen bg-[#02040a] text-zinc-100 flex flex-col font-sans antialiased selection:bg-amber-500 selection:text-zinc-950">
       {/* Top Navigation */}
       <Navbar
         currentView={currentView}
@@ -636,87 +637,137 @@ function AppContent() {
       )}
 
       {/* Main View Router */}
-      <main className="flex-1">
-        {currentView === 'dashboard' && (
-          <DashboardView
-            projects={projects}
-            onNewPitch={handleRequestNewPitch}
-            onOpenProject={(proj) => {
-              setActiveProject(proj);
-              if (proj.slides.length > 0) setCurrentView('studio');
-              else if (proj.analysis) setCurrentView('analysis');
-              else setCurrentView('intake');
-            }}
-            onDeleteProject={handleDeleteProject}
-          />
-        )}
+      <main className="flex-1 relative overflow-hidden">
+        <AnimatePresence mode="wait">
+          {currentView === 'dashboard' && (
+            <motion.div
+              key="dashboard"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <DashboardView
+                projects={projects}
+                onNewPitch={handleRequestNewPitch}
+                onOpenProject={(proj) => {
+                  setActiveProject(proj);
+                  if (proj.slides.length > 0) setCurrentView('studio');
+                  else if (proj.analysis) setCurrentView('analysis');
+                  else setCurrentView('intake');
+                }}
+                onDeleteProject={handleDeleteProject}
+              />
+            </motion.div>
+          )}
 
-        {currentView === 'intake' && (
-          <IntakeFormView
-            initialIntake={activeProject?.intake}
-            onAnalyze={handleAnalyzeIntake}
-            isLoading={isLoading}
-            loadingStep={loadingStep}
-          />
-        )}
+          {currentView === 'intake' && (
+            <motion.div
+              key="intake"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <IntakeFormView
+                initialIntake={activeProject?.intake}
+                onAnalyze={handleAnalyzeIntake}
+                isLoading={isLoading}
+                loadingStep={loadingStep}
+              />
+            </motion.div>
+          )}
 
-        {currentView === 'analysis' && activeProject?.analysis && (
-          <AnalysisCardView
-            analysis={activeProject.analysis}
-            intake={activeProject.intake}
-            onGeneratePitch={handleGeneratePitch}
-            onReanalyze={() => handleAnalyzeIntake(activeProject.intake)}
-            isLoading={isLoading}
-            loadingStep={loadingStep}
-          />
-        )}
+          {currentView === 'analysis' && activeProject?.analysis && (
+            <motion.div
+              key="analysis"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <AnalysisCardView
+                analysis={activeProject.analysis}
+                intake={activeProject.intake}
+                onGeneratePitch={handleGeneratePitch}
+                onReanalyze={() => handleAnalyzeIntake(activeProject.intake)}
+                isLoading={isLoading}
+                loadingStep={loadingStep}
+              />
+            </motion.div>
+          )}
 
-        {currentView === 'studio' && activeProject && (
-          <PitchDeckStudio
-            project={activeProject}
-            onUpdateSlides={handleUpdateSlides}
-            onScorePitch={handleScorePitch}
-            onOpenCritique={handleCritiquePitch}
-            onOpenHistory={() => setShowHistory(true)}
-            onOpenExport={() => setShowExport(true)}
-            onOpenPresentation={() => setShowPresentation(true)}
-            onOpenChallenge={handleOpenChallenge}
-            onOpenBeforeAfter={handleOpenBeforeAfter}
-            onRunAutonomousImprove={handleAutonomousImprove}
-            isImprovingDeck={isAgentImproving || (isLoading && loadingStep.includes('Autonomous'))}
-            isLoadingScore={isLoading && loadingStep.includes('Scoring')}
-            isLoadingCritique={isLoading && loadingStep.includes('VC')}
-          />
-        )}
+          {currentView === 'studio' && activeProject && (
+            <motion.div
+              key="studio"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <PitchDeckStudio
+                project={activeProject}
+                onUpdateSlides={handleUpdateSlides}
+                onScorePitch={handleScorePitch}
+                onOpenCritique={handleCritiquePitch}
+                onOpenHistory={() => setShowHistory(true)}
+                onOpenExport={() => setShowExport(true)}
+                onOpenPresentation={() => setShowPresentation(true)}
+                onOpenChallenge={handleOpenChallenge}
+                onOpenBeforeAfter={handleOpenBeforeAfter}
+                onRunAutonomousImprove={handleAutonomousImprove}
+                isImprovingDeck={isAgentImproving || (isLoading && loadingStep.includes('Autonomous'))}
+                isLoadingScore={isLoading && loadingStep.includes('Scoring')}
+                isLoadingCritique={isLoading && loadingStep.includes('VC')}
+              />
+            </motion.div>
+          )}
 
-        {currentView === 'score' && activeProject?.score && (
-          <QualityScoreView
-            score={activeProject.score}
-            project={activeProject}
-            onOpenCritique={handleCritiquePitch}
-            onOpenStudio={() => setCurrentView('studio')}
-            onOpenHistory={() => setShowHistory(true)}
-            onOpenExport={() => setShowExport(true)}
-            onRunAutonomousImprove={handleAutonomousImprove}
-            onOpenChallenge={handleOpenChallenge}
-            onOpenBeforeAfter={handleOpenBeforeAfter}
-            isLoadingAgent={isAgentImproving}
-          />
-        )}
+          {currentView === 'score' && activeProject?.score && (
+            <motion.div
+              key="score"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <QualityScoreView
+                score={activeProject.score}
+                project={activeProject}
+                onOpenCritique={handleCritiquePitch}
+                onOpenStudio={() => setCurrentView('studio')}
+                onOpenHistory={() => setShowHistory(true)}
+                onOpenExport={() => setShowExport(true)}
+                onRunAutonomousImprove={handleAutonomousImprove}
+                onOpenChallenge={handleOpenChallenge}
+                onOpenBeforeAfter={handleOpenBeforeAfter}
+                isLoadingAgent={isAgentImproving}
+              />
+            </motion.div>
+          )}
 
-        {currentView === 'critique' && activeProject?.critique && (
-          <InvestorCritiqueView
-            critique={activeProject.critique}
-            project={activeProject}
-            onImprovePitch={handleAutonomousImprove}
-            onOpenStudio={() => setCurrentView('studio')}
-            onOpenScore={() => setCurrentView('score')}
-            onOpenExport={() => setShowExport(true)}
-            onOpenChallenge={handleOpenChallenge}
-            onOpenBeforeAfter={handleOpenBeforeAfter}
-            isImproving={isAgentImproving || (isLoading && loadingStep.includes('Revising')) || (isLoading && loadingStep.includes('Autonomous'))}
-          />
-        )}
+          {currentView === 'critique' && activeProject?.critique && (
+            <motion.div
+              key="critique"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <InvestorCritiqueView
+                critique={activeProject.critique}
+                project={activeProject}
+                onImprovePitch={handleAutonomousImprove}
+                onOpenStudio={() => setCurrentView('studio')}
+                onOpenScore={() => setCurrentView('score')}
+                onOpenExport={() => setShowExport(true)}
+                onOpenChallenge={handleOpenChallenge}
+                onOpenBeforeAfter={handleOpenBeforeAfter}
+                isImproving={isAgentImproving || (isLoading && loadingStep.includes('Revising')) || (isLoading && loadingStep.includes('Autonomous'))}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
 
       {!showPresentation && (

@@ -92,7 +92,7 @@ export const InvestorCritiqueView: React.FC<InvestorCritiqueViewProps> = ({
           <button
             onClick={onImprovePitch}
             disabled={isImproving}
-            className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 hover:from-amber-400 hover:to-orange-400 text-zinc-950 px-3.5 py-2 text-xs font-black shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-600 hover:from-yellow-400 hover:to-amber-400 text-zinc-950 px-3.5 py-2 text-xs font-black shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             title="Run Autonomous Multi-Agent Loop to revise target slides and boost investment quality score"
           >
             <Sparkles className="h-3.5 w-3.5 text-zinc-950" />
@@ -252,7 +252,7 @@ export const InvestorCritiqueView: React.FC<InvestorCritiqueViewProps> = ({
           <button
             onClick={onImprovePitch}
             disabled={isImproving}
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 hover:from-amber-400 hover:to-orange-400 text-zinc-950 font-black px-5 py-3 text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-600 hover:from-yellow-400 hover:to-amber-400 text-zinc-950 font-black px-5 py-3 text-xs sm:text-sm shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
           >
             <Sparkles className="h-4 w-4 text-zinc-950" />
             <span>{isImproving ? 'Revising...' : 'Revise Deck (AI)'}</span>

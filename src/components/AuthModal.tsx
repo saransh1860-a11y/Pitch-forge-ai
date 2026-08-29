@@ -11,6 +11,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import logoImg from '../assets/images/pitchforge_logo_1788025673462.jpg';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -71,8 +72,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Brand Icon Header */}
         <div className="text-center space-y-3">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-600 to-rose-600 shadow-xl shadow-orange-500/20">
-            <Flame className="h-7 w-7 text-white" />
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-900 border border-zinc-800 shadow-xl shadow-amber-500/10 overflow-hidden">
+            <img
+              src={logoImg}
+              alt="PitchForge AI Logo"
+              className="h-full w-full object-cover"
+              referrerPolicy="no-referrer"
+            />
           </div>
 
           <div className="space-y-1">

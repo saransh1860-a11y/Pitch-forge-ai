@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   Sparkles,
   Award,
@@ -188,13 +189,13 @@ export const PitchDeckStudio: React.FC<PitchDeckStudioProps> = ({
           <button
             onClick={onOpenCritique}
             disabled={isLoadingCritique}
-            className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-zinc-950 px-3.5 py-2 text-xs font-bold shadow-md shadow-rose-500/20 transition-all active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-blue-700 to-amber-500 hover:from-blue-600 hover:to-amber-400 text-white px-3.5 py-2 text-xs font-bold shadow-md shadow-blue-900/30 transition-all active:scale-95 disabled:opacity-50"
             title="Simulate 60-second VC Partner review and partner comments"
           >
             {isLoadingCritique ? (
-              <RefreshCw className="h-3.5 w-3.5 animate-spin text-zinc-950" />
+              <RefreshCw className="h-3.5 w-3.5 animate-spin text-white" />
             ) : (
-              <ShieldAlert className="h-3.5 w-3.5 text-zinc-950" />
+              <ShieldAlert className="h-3.5 w-3.5 text-white" />
             )}
             <span>60-Second Test</span>
           </button>
@@ -244,7 +245,7 @@ export const PitchDeckStudio: React.FC<PitchDeckStudioProps> = ({
             <button
               onClick={onRunAutonomousImprove}
               disabled={isImprovingDeck}
-              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 hover:from-amber-400 hover:to-orange-400 text-zinc-950 px-3.5 py-2 text-xs font-black shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-yellow-500 via-amber-500 to-yellow-600 hover:from-yellow-400 hover:to-amber-400 text-zinc-950 px-3.5 py-2 text-xs font-black shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-50"
               title="Let AI Investor agent identify weak slides, rewrite narrative, and improve quality score"
             >
               {isImprovingDeck ? (
@@ -332,155 +333,164 @@ export const PitchDeckStudio: React.FC<PitchDeckStudioProps> = ({
         {/* 2. CENTER CANVAS: Slide Preview & Inline Editor */}
         <div className="lg:col-span-6 space-y-6">
           {/* Main Slide Card Container */}
-          <div className="rounded-2xl border border-zinc-800 bg-gradient-to-b from-zinc-900/90 to-zinc-950 p-6 shadow-xl space-y-6">
-            {/* Slide Header */}
-            <div className="flex items-start justify-between gap-4 border-b border-zinc-800/80 pb-4">
-              <div className="space-y-1 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="rounded bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-400 border border-amber-500/30">
-                    SLIDE {currentSlide.slideNumber} OF 10
-                  </span>
-                  <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">
-                    {currentSlide.category.replace('_', ' ')}
-                  </span>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selectedSlideIndex}
+              initial={{ opacity: 0, x: 15 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -15 }}
+              transition={{ duration: 0.2 }}
+              className="rounded-2xl border border-zinc-800 bg-gradient-to-b from-zinc-900/90 to-zinc-950 p-6 shadow-xl space-y-6"
+            >
+              {/* Slide Header */}
+              <div className="flex items-start justify-between gap-4 border-b border-zinc-800/80 pb-4">
+                <div className="space-y-1 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-400 border border-amber-500/30">
+                      SLIDE {currentSlide.slideNumber} OF 10
+                    </span>
+                    <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">
+                      {currentSlide.category.replace('_', ' ')}
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    value={currentSlide.title}
+                    onChange={e => handleCurrentSlideChange('title', e.target.value)}
+                    className="w-full text-xl font-extrabold text-white bg-transparent border-b border-transparent hover:border-zinc-700 focus:border-amber-500 focus:outline-none transition-colors"
+                  />
                 </div>
-                <input
-                  type="text"
-                  value={currentSlide.title}
-                  onChange={e => handleCurrentSlideChange('title', e.target.value)}
-                  className="w-full text-xl font-extrabold text-white bg-transparent border-b border-transparent hover:border-zinc-700 focus:border-amber-500 focus:outline-none transition-colors"
+              </div>
+
+              {/* 1-Second Investor Headline */}
+              <div className="space-y-1.5 bg-amber-500/5 p-3.5 rounded-xl border border-amber-500/20">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
+                  1-Second Investor Takeaway (Headline)
+                </span>
+                <textarea
+                  rows={2}
+                  value={currentSlide.headline}
+                  onChange={e => handleCurrentSlideChange('headline', e.target.value)}
+                  placeholder="The single most memorable thesis on this slide..."
+                  className="w-full text-sm font-semibold text-amber-100 bg-transparent focus:outline-none resize-none leading-snug"
                 />
               </div>
-            </div>
 
-            {/* 1-Second Investor Headline */}
-            <div className="space-y-1.5 bg-amber-500/5 p-3.5 rounded-xl border border-amber-500/20">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
-                1-Second Investor Takeaway (Headline)
-              </span>
-              <textarea
-                rows={2}
-                value={currentSlide.headline}
-                onChange={e => handleCurrentSlideChange('headline', e.target.value)}
-                placeholder="The single most memorable thesis on this slide..."
-                className="w-full text-sm font-semibold text-amber-100 bg-transparent focus:outline-none resize-none leading-snug"
-              />
-            </div>
-
-            {/* Bullet Points */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
-                  Key Slide Content
-                </span>
-                <button
-                  type="button"
-                  onClick={handleAddBullet}
-                  className="flex items-center gap-1 text-[11px] font-semibold text-amber-400 hover:text-amber-300"
-                >
-                  <Plus className="h-3 w-3" /> Add Point
-                </button>
-              </div>
-
-              <div className="space-y-2">
-                {currentSlide.bullets.map((bullet, bIdx) => (
-                  <div key={bIdx} className="group flex items-start gap-2 rounded-lg bg-zinc-900/50 p-2 border border-zinc-800 hover:border-zinc-700">
-                    <span className="text-amber-500 font-bold text-xs mt-1">•</span>
-                    <textarea
-                      rows={2}
-                      value={bullet}
-                      onChange={e => handleBulletChange(bIdx, e.target.value)}
-                      className="w-full text-xs text-zinc-200 bg-transparent focus:outline-none resize-none leading-relaxed"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteBullet(bIdx)}
-                      className="opacity-0 group-hover:opacity-100 p-1 text-zinc-500 hover:text-rose-400 transition-opacity"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Visual Recommendation Mockup */}
-            <div className="rounded-xl border border-zinc-800 bg-zinc-950/70 p-4 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1">
-                  <Grid className="h-3 w-3" /> Recommended Visual Layout: {currentSlide.visualRecommendation.layoutType}
-                </span>
-              </div>
-              <p className="text-xs text-zinc-300 leading-relaxed">
-                {currentSlide.visualRecommendation.description}
-              </p>
-              {currentSlide.visualRecommendation.mockupVisualPrompt && (
-                <div className="rounded bg-zinc-900/80 p-2 text-[11px] text-zinc-400 border border-zinc-800 font-mono">
-                  🎨 {currentSlide.visualRecommendation.mockupVisualPrompt}
-                </div>
-              )}
-            </div>
-
-            {/* Key Data Points with Validation Status */}
-            <div className="space-y-3 pt-2">
-              <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
-                Key Metrics & Assumption Audit
-              </span>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {currentSlide.keyDataPoints.map((dp, dpIdx) => (
-                  <div
-                    key={dpIdx}
-                    className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 space-y-1.5"
+              {/* Bullet Points */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
+                    Key Slide Content
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleAddBullet}
+                    className="flex items-center gap-1 text-[11px] font-semibold text-amber-400 hover:text-amber-300"
                   >
-                    <div className="flex items-center justify-between gap-1">
+                    <Plus className="h-3 w-3" /> Add Point
+                  </button>
+                </div>
+
+                <div className="space-y-2">
+                  {currentSlide.bullets.map((bullet, bIdx) => (
+                    <div key={bIdx} className="group flex items-start gap-2 rounded-lg bg-zinc-900/50 p-2 border border-zinc-800 hover:border-zinc-700">
+                      <span className="text-amber-500 font-bold text-xs mt-1">•</span>
+                      <textarea
+                        rows={2}
+                        value={bullet}
+                        onChange={e => handleBulletChange(bIdx, e.target.value)}
+                        className="w-full text-xs text-zinc-200 bg-transparent focus:outline-none resize-none leading-relaxed"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteBullet(bIdx)}
+                        className="opacity-0 group-hover:opacity-100 p-1 text-zinc-500 hover:text-rose-400 transition-opacity"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Visual Recommendation Mockup */}
+              <div className="rounded-xl border border-zinc-800 bg-zinc-950/70 p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1">
+                    <Grid className="h-3 w-3" /> Recommended Visual Layout: {currentSlide.visualRecommendation.layoutType}
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-300 leading-relaxed">
+                  {currentSlide.visualRecommendation.description}
+                </p>
+                {currentSlide.visualRecommendation.mockupVisualPrompt && (
+                  <div className="rounded bg-zinc-900/80 p-2 text-[11px] text-zinc-400 border border-zinc-800 font-mono">
+                    🎨 {currentSlide.visualRecommendation.mockupVisualPrompt}
+                  </div>
+                )}
+              </div>
+
+              {/* Key Data Points with Validation Status */}
+              <div className="space-y-3 pt-2">
+                <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider">
+                  Key Metrics & Assumption Audit
+                </span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {currentSlide.keyDataPoints.map((dp, dpIdx) => (
+                    <div
+                      key={dpIdx}
+                      className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3 space-y-1.5"
+                    >
+                      <div className="flex items-center justify-between gap-1">
+                        <input
+                          type="text"
+                          value={dp.label}
+                          onChange={e => handleDataPointChange(dpIdx, 'label', e.target.value)}
+                          className="text-xs font-bold text-white bg-transparent focus:outline-none w-full"
+                        />
+                        <select
+                          value={dp.status}
+                          onChange={e => handleDataPointChange(dpIdx, 'status', e.target.value)}
+                          className={`text-[9px] font-bold uppercase rounded px-1.5 py-0.5 border focus:outline-none ${
+                            dp.status === 'validated'
+                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                              : dp.status === 'assumption'
+                              ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+                              : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30'
+                          }`}
+                        >
+                          <option value="validated">VALIDATED</option>
+                          <option value="assumption">ASSUMPTION</option>
+                          <option value="missing">MISSING</option>
+                        </select>
+                      </div>
                       <input
                         type="text"
-                        value={dp.label}
-                        onChange={e => handleDataPointChange(dpIdx, 'label', e.target.value)}
-                        className="text-xs font-bold text-white bg-transparent focus:outline-none w-full"
+                        value={dp.value}
+                        onChange={e => handleDataPointChange(dpIdx, 'value', e.target.value)}
+                        className="text-xs text-zinc-300 bg-transparent focus:outline-none w-full font-mono"
                       />
-                      <select
-                        value={dp.status}
-                        onChange={e => handleDataPointChange(dpIdx, 'status', e.target.value)}
-                        className={`text-[9px] font-bold uppercase rounded px-1.5 py-0.5 border focus:outline-none ${
-                          dp.status === 'validated'
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                            : dp.status === 'assumption'
-                            ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-                            : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30'
-                        }`}
-                      >
-                        <option value="validated">VALIDATED</option>
-                        <option value="assumption">ASSUMPTION</option>
-                        <option value="missing">MISSING</option>
-                      </select>
                     </div>
-                    <input
-                      type="text"
-                      value={dp.value}
-                      onChange={e => handleDataPointChange(dpIdx, 'value', e.target.value)}
-                      className="text-xs text-zinc-300 bg-transparent focus:outline-none w-full font-mono"
-                    />
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Founder Speaker Notes */}
-            <div className="space-y-2 pt-2 border-t border-zinc-800">
-              <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
-                <MessageSquare className="h-3.5 w-3.5 text-zinc-400" /> Founder Speaker Script / Notes
-              </span>
-              <textarea
-                rows={3}
-                value={currentSlide.speakerNotes}
-                onChange={e => handleCurrentSlideChange('speakerNotes', e.target.value)}
-                placeholder="Spoken words to say during presentation..."
-                className="w-full text-xs text-zinc-300 bg-zinc-950/60 p-3 rounded-lg border border-zinc-800 focus:border-amber-500 focus:outline-none leading-relaxed"
-              />
-            </div>
-          </div>
+              {/* Founder Speaker Notes */}
+              <div className="space-y-2 pt-2 border-t border-zinc-800">
+                <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <MessageSquare className="h-3.5 w-3.5 text-zinc-400" /> Founder Speaker Script / Notes
+                </span>
+                <textarea
+                  rows={3}
+                  value={currentSlide.speakerNotes}
+                  onChange={e => handleCurrentSlideChange('speakerNotes', e.target.value)}
+                  placeholder="Spoken words to say during presentation..."
+                  className="w-full text-xs text-zinc-300 bg-zinc-950/60 p-3 rounded-lg border border-zinc-800 focus:border-amber-500 focus:outline-none leading-relaxed"
+                />
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* 3. RIGHT PANEL: AI Pitch Co-pilot Assistant */}
@@ -549,7 +559,7 @@ export const PitchDeckStudio: React.FC<PitchDeckStudioProps> = ({
             {/* Custom Prompt Box */}
             <div className="space-y-2 pt-2 border-t border-zinc-800">
               <label className="block text-[11px] font-semibold text-zinc-300">
-                Custom Instruction for Gemini
+                Custom Instruction for PitchForge AI
               </label>
               <textarea
                 rows={2}
@@ -564,7 +574,7 @@ export const PitchDeckStudio: React.FC<PitchDeckStudioProps> = ({
                 onClick={() => handleAiAction('custom')}
                 className="w-full rounded-lg bg-amber-500 hover:bg-amber-400 disabled:opacity-40 text-zinc-950 font-bold py-2 text-xs transition-colors"
               >
-                {isAiLoading ? 'Gemini is thinking...' : 'Execute Custom Prompt'}
+                {isAiLoading ? 'PitchForge AI is thinking...' : 'Execute Custom Prompt'}
               </button>
             </div>
           </div>

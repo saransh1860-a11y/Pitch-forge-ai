@@ -20,7 +20,7 @@ interface WorkflowProgressProps {
 
 export const WORKFLOW_STEPS = [
   { label: 'RAW IDEA', shortLabel: 'Raw Idea', icon: FileText, desc: 'Startup Intake & Freeform Context' },
-  { label: 'STARTUP ANALYSIS', shortLabel: 'Analysis', icon: Search, desc: 'Gemini Problem & ICP Extraction' },
+  { label: 'STARTUP ANALYSIS', shortLabel: 'Analysis', icon: Search, desc: 'PitchForge AI Problem & ICP Extraction' },
   { label: 'BUSINESS MODEL & MARKET', shortLabel: 'Market & Moat', icon: PieChart, desc: 'TAM/SAM & Defensibility Assessment' },
   { label: '10-SLIDE STORY STRUCTURE', shortLabel: 'Structure', icon: LayoutGrid, desc: 'Investor Sequencing & Archetypes' },
   { label: 'AI-GENERATED PITCH', shortLabel: '10-Slide Pitch', icon: Sparkles, desc: 'Evidence & Assumption Mapped Slides' },

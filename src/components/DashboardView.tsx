@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import {
   Sparkles,
   ArrowRight,
@@ -20,6 +21,7 @@ import {
 } from 'lucide-react';
 import { PitchProject } from '../types/pitch';
 import { useAuth } from '../contexts/AuthContext';
+import logoImg from '../assets/images/pitchforge_logo_1788025673462.jpg';
 
 interface DashboardViewProps {
   projects: PitchProject[];
@@ -64,9 +66,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     return (
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-10">
         {/* User Hero Header */}
-        <div className="relative overflow-hidden rounded-2xl border border-zinc-800 bg-gradient-to-b from-zinc-900/90 via-zinc-900/40 to-zinc-950 p-6 sm:p-10 shadow-2xl">
-          <div className="absolute top-0 right-0 -mt-12 -mr-12 h-96 w-96 rounded-full bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-transparent blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/3 -mb-12 h-64 w-64 rounded-full bg-indigo-500/5 blur-3xl pointer-events-none" />
+        <div className="relative overflow-hidden rounded-2xl border border-blue-900/40 bg-gradient-to-b from-blue-950/20 via-zinc-900/40 to-zinc-950 p-6 sm:p-10 shadow-2xl">
+          <div className="absolute top-0 right-0 -mt-12 -mr-12 h-96 w-96 rounded-full bg-gradient-to-br from-amber-500/10 via-blue-900/10 to-transparent blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/3 -mb-12 h-64 w-64 rounded-full bg-blue-900/10 blur-3xl pointer-events-none" />
 
           <div className="relative z-10 max-w-3xl space-y-5">
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300">
@@ -76,14 +78,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
             <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
               Welcome back,{' '}
-              <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-yellow-200 via-amber-400 to-yellow-600 bg-clip-text text-transparent">
                 {user?.displayName ? user.displayName.split(' ')[0] : 'Founder'}
               </span>
             </h1>
 
             <p className="text-base sm:text-lg text-zinc-300 leading-relaxed font-normal">
               Manage your investor decks, track VC evaluation scores, and generate new pitches backed by
-              Gemini 3.7 Flash and Firestore real-time persistence.
+              PitchForge AI and Firestore real-time persistence.
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-2">
@@ -99,8 +101,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* Real Statistics Section */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 shadow-sm hover:border-zinc-700 transition-colors">
+        <motion.div 
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: {
+                staggerChildren: 0.08
+              }
+            }
+          }}
+        >
+          <motion.div 
+            variants={{
+              hidden: { opacity: 0, y: 10 },
+              visible: { opacity: 1, y: 0 }
+            }}
+            whileHover={{ scale: 1.02 }}
+            className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 shadow-sm hover:border-zinc-700 transition-colors"
+          >
             <div className="flex items-center justify-between text-zinc-400 text-xs font-medium">
               <span>Total Pitches</span>
               <Layers className="h-4 w-4 text-indigo-400" />
@@ -109,9 +131,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <span className="text-2xl sm:text-3xl font-bold text-white">{totalPitches}</span>
               <span className="text-xs text-zinc-400">projects</span>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 shadow-sm hover:border-zinc-700 transition-colors">
+          <motion.div 
+            variants={{
+              hidden: { opacity: 0, y: 10 },
+              visible: { opacity: 1, y: 0 }
+            }}
+            whileHover={{ scale: 1.02 }}
+            className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 shadow-sm hover:border-zinc-700 transition-colors"
+          >
             <div className="flex items-center justify-between text-zinc-400 text-xs font-medium">
               <span>Pitches Generated</span>
               <CheckCircle2 className="h-4 w-4 text-emerald-400" />
@@ -120,9 +149,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <span className="text-2xl sm:text-3xl font-bold text-white">{pitchesGenerated}</span>
               <span className="text-xs text-zinc-400">10-slide decks</span>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 shadow-sm hover:border-zinc-700 transition-colors">
+          <motion.div 
+            variants={{
+              hidden: { opacity: 0, y: 10 },
+              visible: { opacity: 1, y: 0 }
+            }}
+            whileHover={{ scale: 1.02 }}
+            className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 shadow-sm hover:border-zinc-700 transition-colors"
+          >
             <div className="flex items-center justify-between text-zinc-400 text-xs font-medium">
               <span>Avg Investor Score</span>
               <Award className="h-4 w-4 text-amber-400" />
@@ -135,9 +171,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {avgScore >= 80 ? 'Seed Ready' : avgScore >= 65 ? 'Pre-Seed Ready' : 'Evaluated'}
               </span>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 shadow-sm hover:border-zinc-700 transition-colors">
+          <motion.div 
+            variants={{
+              hidden: { opacity: 0, y: 10 },
+              visible: { opacity: 1, y: 0 }
+            }}
+            whileHover={{ scale: 1.02 }}
+            className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5 shadow-sm hover:border-zinc-700 transition-colors"
+          >
             <div className="flex items-center justify-between text-zinc-400 text-xs font-medium">
               <span>Last Edited</span>
               <Clock className="h-4 w-4 text-rose-400" />
@@ -154,8 +197,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   : 'Ready to build'}
               </span>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* My Pitch Projects Section */}
         <div className="space-y-4">
@@ -199,16 +242,35 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: {
+                    staggerChildren: 0.05
+                  }
+                }
+              }}
+            >
               {projects.map((project) => {
                 const hasScore = project.score?.overallScore !== undefined;
                 const hasSlides = project.slides && project.slides.length > 0;
                 const score = project.score?.overallScore || 0;
 
                 return (
-                  <div
+                  <motion.div
                     key={project.id}
                     onClick={() => onOpenProject(project)}
+                    variants={{
+                      hidden: { opacity: 0, y: 15 },
+                      visible: { opacity: 1, y: 0 }
+                    }}
+                    whileHover={{ scale: 1.025, translateY: -2 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     className="group relative flex flex-col justify-between rounded-xl border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900/90 hover:border-zinc-700 p-5 shadow-sm hover:shadow-xl transition-all cursor-pointer"
                   >
                     <div className="space-y-3">
@@ -282,10 +344,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         </span>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
@@ -298,12 +360,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 space-y-16">
       {/* Hero Presentation */}
-      <div className="relative overflow-hidden rounded-3xl border border-zinc-800 bg-gradient-to-b from-zinc-900/90 via-zinc-900/50 to-zinc-950 p-8 sm:p-14 shadow-2xl text-center space-y-8">
+      <div className="relative overflow-hidden rounded-3xl border border-blue-900/40 bg-gradient-to-b from-blue-950/20 via-zinc-900/50 to-zinc-950 p-8 sm:p-14 shadow-2xl text-center space-y-8">
         <div className="absolute top-0 right-1/4 -mt-16 h-80 w-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 -mb-16 h-80 w-80 rounded-full bg-rose-500/10 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 -mb-16 h-80 w-80 rounded-full bg-blue-900/15 blur-3xl pointer-events-none" />
 
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-amber-500 via-orange-600 to-rose-600 shadow-xl shadow-orange-500/20 mb-2">
-          <Flame className="h-8 w-8 text-white" />
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-900 border border-zinc-800 shadow-xl shadow-amber-500/10 overflow-hidden mb-2">
+          <img
+            src={logoImg}
+            alt="PitchForge AI Logo"
+            className="h-full w-full object-cover"
+            referrerPolicy="no-referrer"
+          />
         </div>
 
         <div className="max-w-3xl mx-auto space-y-4">
@@ -314,14 +381,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
           <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white leading-tight">
             Build a pitch{' '}
-            <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-yellow-200 via-amber-400 to-yellow-600 bg-clip-text text-transparent">
               investors understand.
             </span>
           </h1>
 
           <p className="text-base sm:text-lg text-zinc-300 leading-relaxed max-w-2xl mx-auto">
             Transform messy, unstructured startup thoughts into an evidence-oriented 10-slide pitch deck
-            with Gemini 3.7 Flash, quantitative data points, and investor evaluation rubrics.
+            with PitchForge AI, quantitative data points, and investor evaluation rubrics.
           </p>
         </div>
 

@@ -66,7 +66,7 @@ export const InvestorDecisionCard: React.FC<InvestorDecisionCardProps> = ({
   return (
     <div className="relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 p-6 sm:p-7 shadow-2xl transition-all">
       {/* Subtle Top Gradient Accent */}
-      <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${decision.decision === 'INVEST' ? 'from-emerald-500 via-teal-400 to-emerald-600' : decision.decision === 'WATCHLIST' ? 'from-amber-500 via-orange-400 to-amber-600' : 'from-rose-500 via-pink-500 to-rose-600'}`} />
+      <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${decision.decision === 'INVEST' ? 'from-emerald-500 via-teal-400 to-emerald-600' : decision.decision === 'WATCHLIST' ? 'from-yellow-400 via-amber-400 to-yellow-600' : 'from-blue-900 via-slate-800 to-slate-900'}`} />
 
       <div className="space-y-6">
         {/* Header Row: Decision Badge & Conviction Meter */}
@@ -234,7 +234,7 @@ export const InvestorDecisionCard: React.FC<InvestorDecisionCardProps> = ({
               <button
                 onClick={onRunAutonomousImprove}
                 disabled={isLoadingAgent}
-                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-zinc-950 px-4 py-2 text-xs sm:text-sm font-bold shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-zinc-950 px-4 py-2 text-xs sm:text-sm font-bold shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoadingAgent ? (
                   <>

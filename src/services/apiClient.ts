@@ -32,7 +32,7 @@ export async function analyzeStartupApi(intake: StartupIntake): Promise<StartupA
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ intake }),
   });
-  return parseApiResponse<StartupAnalysis>(res, 'Failed to analyze startup with Gemini');
+  return parseApiResponse<StartupAnalysis>(res, 'Failed to analyze startup with PitchForge AI');
 }
 
 export async function generatePitchApi(
@@ -44,7 +44,7 @@ export async function generatePitchApi(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ intake, analysis }),
   });
-  const data = await parseApiResponse<{ slides: SlideData[] }>(res, 'Failed to generate 10-slide pitch with Gemini');
+  const data = await parseApiResponse<{ slides: SlideData[] }>(res, 'Failed to generate 10-slide pitch with PitchForge AI');
   return data.slides;
 }
 

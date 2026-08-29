@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { PitchProject } from '../types/pitch';
 import { useAuth } from '../contexts/AuthContext';
+import logoImg from '../assets/images/pitchforge_logo_1788025673462.jpg';
 
 interface NavbarProps {
   currentView: 'dashboard' | 'intake' | 'analysis' | 'studio' | 'score' | 'critique';
@@ -51,7 +52,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-blue-900/30 bg-[#02040a]/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         {/* Brand */}
         <div className="flex items-center gap-6">
@@ -59,8 +60,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setCurrentView('dashboard')}
             className="group flex items-center gap-3 text-left focus:outline-none cursor-pointer"
           >
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-amber-500 via-orange-600 to-rose-600 shadow-lg shadow-orange-500/20 group-hover:scale-105 transition-transform duration-200">
-              <Flame className="h-5 w-5 text-white" />
+            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-900 border border-zinc-800 shadow-lg shadow-amber-500/10 group-hover:scale-105 transition-transform duration-200 overflow-hidden">
+              <img
+                src={logoImg}
+                alt="PitchForge AI Logo"
+                className="h-full w-full object-cover"
+                referrerPolicy="no-referrer"
+              />
               <div className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-emerald-400 border-2 border-zinc-950" />
             </div>
             <div>

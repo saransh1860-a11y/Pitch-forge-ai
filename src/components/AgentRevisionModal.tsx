@@ -217,7 +217,7 @@ export const AgentRevisionModal: React.FC<AgentRevisionModalProps> = ({
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-800/80 p-0.5 border border-zinc-700/50">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-emerald-400 transition-all duration-500"
+              className="h-full rounded-full bg-gradient-to-r from-blue-700 via-blue-500 to-amber-500 transition-all duration-500"
               style={{
                 width: isComplete ? '100%' : `${Math.max(15, ((currentStepIndex + 1) / AGENT_PIPELINE.length) * 100)}%`,
               }}

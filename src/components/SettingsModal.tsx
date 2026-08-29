@@ -85,7 +85,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
               <span className="text-zinc-500 text-[10px] uppercase font-bold block">AI Engine</span>
               <span className="font-bold text-white flex items-center gap-1.5">
                 <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-                Gemini 3.7 Flash (@google/genai)
+                PitchForge AI Engine
               </span>
             </div>
 

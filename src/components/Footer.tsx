@@ -14,6 +14,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import logoImg from '../assets/images/pitchforge_logo_1788025673462.jpg';
 
 interface FooterProps {
   onNavigate: (view: 'dashboard' | 'intake' | 'analysis' | 'studio' | 'score' | 'critique') => void;
@@ -44,8 +45,13 @@ export const Footer: React.FC<FooterProps> = ({
           {/* Brand Info (2 columns wide on lg) */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-amber-500 via-orange-600 to-rose-600 shadow-md shadow-orange-500/20">
-                <Flame className="h-5 w-5 text-white" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-900 border border-zinc-800 shadow-md shadow-amber-500/10 overflow-hidden">
+                <img
+                  src={logoImg}
+                  alt="PitchForge AI Logo"
+                  className="h-full w-full object-cover"
+                  referrerPolicy="no-referrer"
+                />
               </div>
               <div className="flex flex-col">
                 <span className="text-base font-black tracking-tight text-white flex items-center gap-1.5">
@@ -64,7 +70,7 @@ export const Footer: React.FC<FooterProps> = ({
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/5 px-2.5 py-1 text-[11px] font-medium text-amber-300">
                 <Zap className="h-3 w-3 text-amber-400" />
-                <span>Gemini 3.7 Flash</span>
+                <span>PitchForge AI Engine</span>
               </div>
               <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-2.5 py-1 text-[11px] font-medium text-emerald-300">
                 <Database className="h-3 w-3 text-emerald-400" />

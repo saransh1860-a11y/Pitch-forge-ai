@@ -71,7 +71,7 @@ export const IntakeFormView: React.FC<IntakeFormViewProps> = ({
             <h1 className="text-2xl font-extrabold text-white">Startup Intake & Strategic Input</h1>
           </div>
           <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-            Provide your raw startup thinking. Gemini will analyze the assumptions, market, and business model.
+            Provide your raw startup thinking. PitchForge AI will analyze the assumptions, market, and business model.
           </p>
         </div>
 
@@ -417,7 +417,7 @@ export const IntakeFormView: React.FC<IntakeFormViewProps> = ({
         <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 text-xs text-amber-200/90">
           <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
           <p>
-            <span className="font-semibold text-amber-300">PitchForge AI Non-Fabrication Rule:</span> Gemini will never invent fake revenue, customer numbers, or traction. Any unverified metrics will be explicitly tagged as <span className="font-mono text-amber-400 font-semibold">[ASSUMPTION - NEEDS VALIDATION]</span> so your deck remains honest and credible to institutional VCs.
+            <span className="font-semibold text-amber-300">PitchForge AI Non-Fabrication Rule:</span> PitchForge AI will never invent fake revenue, customer numbers, or traction. Any unverified metrics will be explicitly tagged as <span className="font-mono text-amber-400 font-semibold">[ASSUMPTION - NEEDS VALIDATION]</span> so your deck remains honest and credible to institutional VCs.
           </p>
         </div>
 
@@ -431,12 +431,12 @@ export const IntakeFormView: React.FC<IntakeFormViewProps> = ({
             {isLoading ? (
               <>
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-950 border-t-transparent" />
-                <span>{loadingStep || 'Analyzing startup with Gemini...'}</span>
+                <span>{loadingStep || 'Analyzing startup with PitchForge AI...'}</span>
               </>
             ) : (
               <>
                 <Sparkles className="h-4 w-4 stroke-[2.5]" />
-                <span>Analyze Idea with Gemini</span>
+                <span>Analyze Idea with PitchForge AI</span>
                 <ArrowRight className="h-4 w-4" />
               </>
             )}
