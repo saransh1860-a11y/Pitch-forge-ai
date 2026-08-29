@@ -10,17 +10,29 @@ import {
   ChallengeResolutionResult,
 } from '../types/pitch';
 
+async function parseApiResponse<T>(res: Response, defaultError: string): Promise<T> {
+  const contentType = res.headers.get('content-type') || '';
+  if (!res.ok) {
+    if (contentType.includes('application/json')) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || defaultError);
+    }
+    const text = await res.text().catch(() => '');
+    throw new Error(text && text.length < 150 ? text : defaultError);
+  }
+  if (!contentType.includes('application/json')) {
+    throw new Error('Server returned an unexpected response format. Please try again.');
+  }
+  return res.json();
+}
+
 export async function analyzeStartupApi(intake: StartupIntake): Promise<StartupAnalysis> {
   const res = await fetch('/api/analyze-startup', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ intake }),
   });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || 'Failed to analyze startup with Gemini');
-  }
-  return res.json();
+  return parseApiResponse<StartupAnalysis>(res, 'Failed to analyze startup with Gemini');
 }
 
 export async function generatePitchApi(
@@ -32,11 +44,7 @@ export async function generatePitchApi(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ intake, analysis }),
   });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || 'Failed to generate 10-slide pitch with Gemini');
-  }
-  const data = await res.json();
+  const data = await parseApiResponse<{ slides: SlideData[] }>(res, 'Failed to generate 10-slide pitch with Gemini');
   return data.slides;
 }
 
@@ -50,11 +58,7 @@ export async function scorePitchApi(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ intake, slides, analysis }),
   });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || 'Failed to score pitch deck');
-  }
-  return res.json();
+  return parseApiResponse<PitchScore>(res, 'Failed to score pitch deck');
 }
 
 export async function critiquePitchApi(
@@ -66,11 +70,7 @@ export async function critiquePitchApi(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ intake, slides }),
   });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || 'Failed to run AI investor critique');
-  }
-  return res.json();
+  return parseApiResponse<InvestorCritique>(res, 'Failed to run AI investor critique');
 }
 
 export async function improveSlideApi(
@@ -88,11 +88,7 @@ export async function improveSlideApi(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ slide, instruction, customPrompt, startupContext }),
   });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || 'Failed to improve slide with AI');
-  }
-  return res.json();
+  return parseApiResponse(res, 'Failed to improve slide with AI');
 }
 
 export async function improvePitchApi(
@@ -108,11 +104,7 @@ export async function improvePitchApi(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ intake, slides, critique }),
   });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || 'Failed to refine pitch with AI');
-  }
-  return res.json();
+  return parseApiResponse(res, 'Failed to refine pitch with AI');
 }
 
 export async function evaluateInvestorDecisionApi(
@@ -126,11 +118,7 @@ export async function evaluateInvestorDecisionApi(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ intake, slides, score, analysis }),
   });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || 'Failed to evaluate investor decision');
-  }
-  return res.json();
+  return parseApiResponse<InvestorDecision>(res, 'Failed to evaluate investor decision');
 }
 
 export async function autonomousImprovePitchApi(
@@ -146,11 +134,7 @@ export async function autonomousImprovePitchApi(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ intake, slides, currentScore, critique, decision, analysis }),
   });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || 'Failed to run autonomous investor improvement');
-  }
-  return res.json();
+  return parseApiResponse<AutonomousImprovementResult>(res, 'Failed to run autonomous investor improvement');
 }
 
 export async function generateInvestorChallengeApi(
@@ -165,11 +149,7 @@ export async function generateInvestorChallengeApi(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ intake, slides, score, critique, decision }),
   });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || 'Failed to generate investor challenge');
-  }
-  return res.json();
+  return parseApiResponse<InvestorChallenge>(res, 'Failed to generate investor challenge');
 }
 
 export async function resolveInvestorChallengeApi(
@@ -185,9 +165,6 @@ export async function resolveInvestorChallengeApi(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ intake, slides, currentScore, challenge, founderAnswer, analysis }),
   });
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data.error || 'Failed to resolve investor challenge');
-  }
-  return res.json();
+  return parseApiResponse<ChallengeResolutionResult>(res, 'Failed to resolve investor challenge');
 }
+
