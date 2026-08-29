@@ -4,34 +4,32 @@ PitchForge AI generates, analyzes, scores, and autonomously refines 10-slide VC 
 
 ---
 
-## 🚀 Deploying to Render (Zero Configuration)
+## ⚡ Deploying to Vercel (Recommended)
 
-You can deploy PitchForge AI to [Render](https://render.com) in 2 minutes:
-
-### Option 1: Automatic Blueprint (Recommended)
-1. Push this repository to your GitHub or GitLab account.
-2. Log in to [Render Dashboard](https://dashboard.render.com/).
-3. Click **New +** → **Blueprint**.
-4. Connect your repository. Render will automatically read `render.yaml`.
-5. Under Environment Variables, provide your `GEMINI_API_KEY`.
-6. Click **Apply**!
+1. Push your repository to **GitHub** or **GitLab**.
+2. Go to [Vercel Dashboard](https://vercel.com/dashboard) and click **Add New...** → **Project**.
+3. Import your repository.
+4. Set **Framework Preset**: `Vite` (Output directory: `dist`).
+5. Under **Environment Variables**, add:
+   - `GEMINI_API_KEY`: *(Your Google Gemini API Key)*
+6. Click **Deploy**!
+   *(The included `vercel.json` and `api/index.ts` will automatically route the frontend SPA and all `/api/*` serverless requests without any 404 NOT_FOUND routing issues)*.
 
 ---
 
-### Option 2: Manual Web Service Setup
-1. In Render, click **New +** → **Web Service**.
-2. Connect your GitHub repository.
-3. Configure the settings:
-   - **Name**: `pitchforge-ai`
-   - **Runtime**: `Node`
-   - **Branch**: `main` (or your default branch)
-   - **Build Command**: `npm install && npm run build`
-   - **Start Command**: `npm start`
-   - **Instance Type**: `Free` or `Starter`
-4. Under **Environment Variables**, add:
-   - `GEMINI_API_KEY`: *Your Google Gemini API Key*
-   - `NODE_ENV`: `production`
-5. Click **Deploy Web Service**!
+## 🚀 Deploying to Render (Web Service)
+
+### Option 1: Automatic Blueprint (Zero Configuration)
+1. In the [Render Dashboard](https://dashboard.render.com/), click **New +** → **Blueprint**.
+2. Connect your repository. Render will automatically detect `render.yaml`.
+3. Enter your `GEMINI_API_KEY` under Environment Variables and click **Apply**!
+
+### Option 2: Manual Web Service
+- **Runtime**: `Node`
+- **Build Command**: `npm install && npm run build`
+- **Start Command**: `npm start`
+- **Health Check Path**: `/api/health`
+- **Environment Variables**: `GEMINI_API_KEY`
 
 ---
 
