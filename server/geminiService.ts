@@ -26,7 +26,7 @@ export function getGenAIClient(): GoogleGenAI {
 }
 
 // Valid models in accordance with gemini-api skill guide
-const CANDIDATE_MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-3-flash-preview', 'gemini-flash-latest'];
+const CANDIDATE_MODELS = ['gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest'];
 
 /**
  * Helper to race a promise against a timeout
@@ -41,7 +41,7 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMsg: stri
 
 /**
  * Fast & resilient execution wrapper: calls Gemini with timeout protection and fast fallback.
- * Uses gemini-2.5-flash as the ultra-fast primary model and bounds request duration to prevent UI freezing.
+ * Uses gemini-3.7-flash as the ultra-fast primary model and bounds request duration to prevent UI freezing.
  */
 async function callGeminiWithRetry(options: {
   contents: any;
