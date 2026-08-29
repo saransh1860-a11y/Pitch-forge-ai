@@ -1,0 +1,8 @@
+{
+  "name": "PitchForge AI",
+  "description": "AI-powered startup pitch builder that transforms raw startup ideas into coherent, investor-ready 10-slide pitches using Gemini on Google Cloud.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

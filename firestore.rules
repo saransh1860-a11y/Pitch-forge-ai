@@ -1,0 +1,70 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Default-Deny Catch-All
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidProject(data) {
+      return data.keys().hasAll(['id', 'ownerId', 'startupName', 'status', 'currentVersion', 'intake', 'slides', 'versions', 'createdAt', 'updatedAt'])
+        && data.id is string && data.id.size() <= 128
+        && data.ownerId is string && data.ownerId.size() <= 128
+        && data.startupName is string && data.startupName.size() <= 200
+        && data.status is string && (data.status == 'draft' || data.status == 'analyzed' || data.status == 'generated' || data.status == 'critiqued' || data.status == 'refined')
+        && data.currentVersion is number && data.currentVersion >= 1 && data.currentVersion <= 1000
+        && data.intake is map
+        && data.slides is list && data.slides.size() <= 30
+        && data.versions is list && data.versions.size() <= 100
+        && data.createdAt is string && data.createdAt.size() <= 64
+        && data.updatedAt is string && data.updatedAt.size() <= 64
+        && (!('ownerEmail' in data) || data.ownerEmail == null || (data.ownerEmail is string && data.ownerEmail.size() <= 256))
+        && (!('analysis' in data) || data.analysis == null || data.analysis is map)
+        && (!('score' in data) || data.score == null || data.score is map)
+        && (!('critique' in data) || data.critique == null || data.critique is map);
+    }
+
+    // Projects collection
+    match /projects/{projectId} {
+      allow read: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      
+      allow create: if isSignedIn()
+        && isValidId(projectId)
+        && incoming().id == projectId
+        && incoming().ownerId == request.auth.uid
+        && isValidProject(incoming());
+        
+      allow update: if isSignedIn()
+        && isValidId(projectId)
+        && isValidProject(incoming())
+        && existing().ownerId == request.auth.uid
+        && incoming().ownerId == request.auth.uid
+        && incoming().id == existing().id;
+        
+      allow delete: if isSignedIn() && existing().ownerId == request.auth.uid && isValidId(projectId);
+    }
+  }
+}

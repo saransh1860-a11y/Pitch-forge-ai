@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+  
+  code, pre, kbd {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(24, 24, 27, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(63, 63, 70, 0.6);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(113, 113, 122, 0.8);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Print styles for PDF / deck printing */
+@media print {
+  @page {
+    size: landscape;
+    margin: 12mm;
+  }
+
+  html, body {
+    background-color: #ffffff !important;
+    color: #09090b !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Hide UI elements on print */
+  header, nav, button, .no-print, [role="dialog"] > div:first-child button {
+    display: none !important;
+  }
+
+  /* Reset modal containers for printable output */
+  .fixed {
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
+  .max-h-96, .max-h-[80vh], .overflow-y-auto, .overflow-hidden {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Page break helpers */
+  .print-page-break {
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .print-avoid-break {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Print document container */
+  .pitch-print-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    background: #ffffff !important;
+    color: #09090b !important;
+  }
+
+  .pitch-print-card {
+    background: #ffffff !important;
+    border: 1.5px solid #d4d4d8 !important;
+    color: #09090b !important;
+    box-shadow: none !important;
+  }
+}

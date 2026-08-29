@@ -1,0 +1,82 @@
+{
+  "entities": {
+    "Project": {
+      "title": "PitchProject",
+      "description": "A founder pitch deck project containing startup intake, AI analysis, slides, scores, and critiques.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the project",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the creator and owner",
+          "maxLength": 128
+        },
+        "ownerEmail": {
+          "type": "string",
+          "description": "Email address of the project owner",
+          "maxLength": 256
+        },
+        "startupName": {
+          "type": "string",
+          "description": "Name of the startup company",
+          "maxLength": 200
+        },
+        "status": {
+          "type": "string",
+          "description": "Current lifecycle status of the pitch project",
+          "enum": ["draft", "analyzed", "generated", "critiqued", "refined"]
+        },
+        "currentVersion": {
+          "type": "number",
+          "description": "Active version number of the pitch deck"
+        },
+        "intake": {
+          "type": "object",
+          "description": "Raw startup founder inputs and problem framing"
+        },
+        "analysis": {
+          "type": "object",
+          "description": "Gemini structured strategic analysis"
+        },
+        "slides": {
+          "type": "array",
+          "description": "Array of 10 structured pitch deck slides"
+        },
+        "score": {
+          "type": "object",
+          "description": "VC quality scorecard evaluation"
+        },
+        "critique": {
+          "type": "object",
+          "description": "AI Investor critique, hard questions, and punch list"
+        },
+        "versions": {
+          "type": "array",
+          "description": "Array of saved historical pitch deck snapshots"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of creation date",
+          "maxLength": 64
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of latest modification",
+          "maxLength": 64
+        }
+      },
+      "required": ["id", "ownerId", "startupName", "status", "currentVersion", "intake", "slides", "versions", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/projects/{projectId}": {
+      "schema": "Project",
+      "description": "Collection of founder pitch deck projects owned by authenticated users."
+    }
+  }
+}
