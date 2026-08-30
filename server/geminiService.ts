@@ -26,7 +26,7 @@ export function getGenAIClient(): GoogleGenAI {
 }
 
 // Valid models in accordance with gemini-api skill guide
-const CANDIDATE_MODELS = ['gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest'];
+const CANDIDATE_MODELS = ['gemini-3.7-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest'];
 
 /**
  * Helper to race a promise against a timeout
@@ -55,7 +55,7 @@ async function callGeminiWithRetry(options: {
 
   let lastError: any = null;
   const ai = getGenAIClient();
-  const perCallTimeout = options.timeoutMs || 14000; // 14 seconds max per generation call
+  const perCallTimeout = options.timeoutMs || 8000; // 8 seconds max per generation call for fast fallback transitions
 
   for (const model of modelsToTry) {
     try {
