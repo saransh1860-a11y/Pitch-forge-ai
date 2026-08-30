@@ -44,7 +44,10 @@ service cloud.firestore {
         && (!('ownerEmail' in data) || data.ownerEmail == null || (data.ownerEmail is string && data.ownerEmail.size() <= 256))
         && (!('analysis' in data) || data.analysis == null || data.analysis is map)
         && (!('score' in data) || data.score == null || data.score is map)
-        && (!('critique' in data) || data.critique == null || data.critique is map);
+        && (!('critique' in data) || data.critique == null || data.critique is map)
+        && (!('decision' in data) || data.decision == null || data.decision is map)
+        && (!('lastAgentResult' in data) || data.lastAgentResult == null || data.lastAgentResult is map)
+        && (!('lastChallenge' in data) || data.lastChallenge == null || data.lastChallenge is map);
     }
 
     // Projects collection

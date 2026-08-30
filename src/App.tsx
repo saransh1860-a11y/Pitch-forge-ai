@@ -84,6 +84,24 @@ function AppContent() {
   useEffect(() => {
     if (user && !isAnonymous) {
       setSyncStatus('syncing');
+
+      // Seamlessly migrate guest projects to authenticated user on sign-in
+      const guestProjects = getStoredProjects(null);
+      if (guestProjects.length > 0) {
+        console.log(`Migrating ${guestProjects.length} guest projects to authenticated user ${user.uid}`);
+        for (const gp of guestProjects) {
+          const migratedProject: PitchProject = {
+            ...gp,
+            updatedAt: new Date().toISOString()
+          };
+          saveLocalProject(migratedProject, user.uid);
+          saveProjectToFirestore(migratedProject, user.uid, user.email).catch((err) => {
+            console.error('Error migrating guest project to Firestore:', err);
+          });
+        }
+        localStorage.removeItem('pitchforge_guest_projects');
+      }
+
       // Instantly load locally cached projects so the user doesn't experience waiting delays
       const cached = getStoredProjects(user.uid);
       if (cached.length > 0) {

@@ -78,6 +78,9 @@ export function subscribeUserProjects(
             versions: Array.isArray(data.versions) ? data.versions : [],
             score: data.score || undefined,
             critique: data.critique || undefined,
+            decision: data.decision || undefined,
+            lastAgentResult: data.lastAgentResult || undefined,
+            lastChallenge: data.lastChallenge || undefined,
             status: data.status || 'draft',
           });
         });
@@ -132,6 +135,15 @@ export async function saveProjectToFirestore(
     if (project.critique) {
       rawPayload.critique = project.critique;
     }
+    if (project.decision) {
+      rawPayload.decision = project.decision;
+    }
+    if (project.lastAgentResult) {
+      rawPayload.lastAgentResult = project.lastAgentResult;
+    }
+    if (project.lastChallenge) {
+      rawPayload.lastChallenge = project.lastChallenge;
+    }
 
     const cleanPayload = sanitizeForFirestore(rawPayload);
     await setDoc(doc(db, 'projects', project.id), cleanPayload, { merge: true });
@@ -177,6 +189,9 @@ export async function fetchUserProjects(userId: string): Promise<PitchProject[]>
         versions: Array.isArray(data.versions) ? data.versions : [],
         score: data.score || undefined,
         critique: data.critique || undefined,
+        decision: data.decision || undefined,
+        lastAgentResult: data.lastAgentResult || undefined,
+        lastChallenge: data.lastChallenge || undefined,
         status: data.status || 'draft',
       });
     });
