@@ -162,6 +162,10 @@ export interface InvestorChallenge {
   status?: 'pending' | 'resolved';
   founderResponse?: string;
   resolutionSummary?: string;
+  idealAnswerOutline?: string;
+  founderKnowledgeScore?: number;
+  evaluationGrade?: string;
+  evaluationFeedback?: string;
 }
 
 export interface ChallengeResolutionResult {
@@ -174,6 +178,11 @@ export interface ChallengeResolutionResult {
   scoreDifference: number;
   newDecision?: InvestorDecision;
   explanation: string;
+  founderKnowledgeScore?: number;
+  evaluationGrade?: string;
+  evaluationFeedback?: string;
+  idealAnswerDiligence?: string;
+  isPassed?: boolean;
 }
 
 export interface PitchVersion {

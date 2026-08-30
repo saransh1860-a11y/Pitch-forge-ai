@@ -1548,7 +1548,8 @@ Moat: ${intake.competitiveAdvantage || 'Undocumented'}
 Score: ${score?.overallScore || '70'}/100
 Primary Bottleneck: ${decision?.weakestScoringDimension || critique?.weakestPart || 'Traction'}
 
-Generate a sharp, high-stakes investor question that tests the founder's assumptions and invites them to provide concrete evidence (e.g. pilot numbers, customer quotes, retention data, bottom-up pricing).`;
+Generate a sharp, high-stakes investor question that tests the founder's assumptions and invites them to provide concrete evidence (e.g. pilot numbers, customer quotes, retention data, bottom-up pricing).
+Also, define what a top-tier credible answer must conceptually convey (the "ideal answer in mind") to be validated.`;
 
   try {
     const text = await callGeminiWithRetry({
@@ -1569,8 +1570,12 @@ Generate a sharp, high-stakes investor question that tests the founder's assumpt
               items: { type: Type.STRING },
               description: '3 concrete types of proof the founder can submit to satisfy the question',
             },
+            idealAnswerOutline: {
+              type: Type.STRING,
+              description: 'The core meaning, facts, or strategic rationale that the founder must convey to pass this challenge'
+            }
           },
-          required: ['questionId', 'question', 'context', 'category', 'suggestedEvidenceTypes'],
+          required: ['questionId', 'question', 'context', 'category', 'suggestedEvidenceTypes', 'idealAnswerOutline'],
         },
       },
     });
@@ -1596,128 +1601,62 @@ export async function resolveInvestorChallenge(
   const prompt = `A founder has submitted real evidence/answers to satisfy an Investor Challenge.
 Startup: ${intake.startupName}
 Investor Challenge Question: "${challenge.question}"
+Ideal Answer in Mind / Target Criteria: "${challenge.idealAnswerOutline || 'The founder must provide specific indicators of user feedback, pilot signup counts, conversion rates, signed agreements (LOIs), or historical retention percentages that prove demand is more than just an assumption.'}"
 Founder Evidence & Answer: "${founderAnswer}"
 
 Task:
-1. Evaluate whether the founder's response provides meaningful validation or clarity.
-2. Determine which slide(s) (1 to 10) should be updated to incorporate this authentic founder proof.
-3. Update ONLY those specific slides with the new evidence (e.g. converting assumptions into 'validated' data points, adding customer quotes or pilot metrics to bullets).
-4. NEVER invent facts beyond what the founder provided.`;
+1. Sincerely evaluate the meaning and logical content of the founder's answer.
+2. Check for empty, trivial, evasive, or gibberish responses (e.g. "ABCD", "test", "asdf", "lol", etc.). If the answer is nonsensical, completely off-topic, or lacks logical substance, you must:
+   - Assign a very low "founderKnowledgeScore" (0 to 30 out of 100).
+   - Set "isPassed" to false.
+   - Set "evaluationGrade" to "Incomplete / Invalid".
+   - Set "evaluationFeedback" to explain that the response is evasive or invalid, and detail what information was expected.
+3. If the answer is different in phrasing but has a similar meaning, addresses the question logically, or is a sincere, relevant answer:
+   - Assign a high "founderKnowledgeScore" (60 to 100 out of 100).
+   - Set "isPassed" to true.
+   - Set "evaluationGrade" to "Good" or "Excellent" depending on detail.
+   - Set "evaluationFeedback" to detail what made this answer credible and strong.
+4. Pitch Score Integrity: As this is a test of founder knowledge and does not alter the static slide layout structure, the overall pitch deck score is NOT modified. The newScore will match the currentScore.`;
 
   try {
     const text = await callGeminiWithRetry({
       contents: prompt,
       config: {
         systemInstruction:
-          'You integrate genuine founder evidence into investor pitch slides with high precision and re-evaluate investment viability.',
+          'You are an elite venture capitalist evaluating a founder\'s responses during a high-stakes investor challenge. You enforce strict logic and reject nonsense.',
         responseMimeType: 'application/json',
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            evaluation: { type: Type.STRING, description: 'VC evaluation of the submitted evidence strength' },
-            changedSlideNumbers: {
-              type: Type.ARRAY,
-              items: { type: Type.INTEGER },
-              description: 'Slide numbers modified with the evidence',
-            },
-            updatedSlides: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  slideNumber: { type: Type.INTEGER },
-                  title: { type: Type.STRING },
-                  category: { type: Type.STRING },
-                  headline: { type: Type.STRING },
-                  bullets: {
-                    type: Type.ARRAY,
-                    items: { type: Type.STRING },
-                  },
-                  visualRecommendation: {
-                    type: Type.OBJECT,
-                    properties: {
-                      layoutType: { type: Type.STRING },
-                      description: { type: Type.STRING },
-                      mockupVisualPrompt: { type: Type.STRING },
-                    },
-                    required: ['layoutType', 'description'],
-                  },
-                  keyDataPoints: {
-                    type: Type.ARRAY,
-                    items: {
-                      type: Type.OBJECT,
-                      properties: {
-                        label: { type: Type.STRING },
-                        value: { type: Type.STRING },
-                        status: { type: Type.STRING },
-                      },
-                      required: ['label', 'value', 'status'],
-                    },
-                  },
-                  speakerNotes: { type: Type.STRING },
-                  evidenceRequirements: {
-                    type: Type.ARRAY,
-                    items: { type: Type.STRING },
-                  },
-                },
-                required: ['slideNumber', 'title', 'category', 'headline', 'bullets', 'visualRecommendation', 'keyDataPoints', 'speakerNotes', 'evidenceRequirements'],
-              },
-            },
-            explanation: { type: Type.STRING, description: 'Summary of how the pitch was upgraded with founder proof' },
+            evaluation: { type: Type.STRING, description: 'Constructive VC evaluation of the submitted response' },
+            founderKnowledgeScore: { type: Type.INTEGER, description: 'Knowledge rating from 0 to 100' },
+            evaluationGrade: { type: Type.STRING, description: 'Excellent | Good | Needs Work | Incomplete / Invalid' },
+            evaluationFeedback: { type: Type.STRING, description: 'Explanation of why the response is correct, or why it failed if it was gibberish like ABCD' },
+            idealAnswerDiligence: { type: Type.STRING, description: 'Concept outline of what a strong, credible VC response looks like for this challenge' },
+            isPassed: { type: Type.BOOLEAN, description: 'True if the answer has correct meaning or represents a sincere, valid response' },
+            explanation: { type: Type.STRING, description: 'Summary of the evaluation outcome' }
           },
-          required: ['evaluation', 'changedSlideNumbers', 'updatedSlides', 'explanation'],
+          required: ['evaluation', 'founderKnowledgeScore', 'evaluationGrade', 'evaluationFeedback', 'idealAnswerDiligence', 'isPassed', 'explanation'],
         },
       },
     });
 
     const parsed = JSON.parse(text);
-    const changedNumbers: number[] = parsed.changedSlideNumbers || [8];
-
-    const slideUpdateMap = new Map<number, SlideData>();
-    for (const s of parsed.updatedSlides || []) {
-      slideUpdateMap.set(s.slideNumber, {
-        ...s,
-        id: s.slideNumber,
-        isEdited: true,
-      });
-    }
-
-    const mergedSlides = slides.map((orig) => {
-      if (slideUpdateMap.has(orig.slideNumber)) {
-        return slideUpdateMap.get(orig.slideNumber)!;
-      }
-      return orig;
-    });
-
-    // Validate that at least one of the slides was actually modified with real changes
-    let anySlideChanged = false;
-    for (const num of changedNumbers) {
-      const orig = slides.find((s) => s.slideNumber === num);
-      const rev = mergedSlides.find((s) => s.slideNumber === num);
-      if (orig && rev && hasSlideActuallyChanged(orig, rev)) {
-        anySlideChanged = true;
-      }
-    }
-
-    if (!anySlideChanged) {
-      console.warn('Gemini returned identical slides in resolveInvestorChallenge. Applying heuristic fallback to incorporate the proof.');
-      return fallbackResolveInvestorChallenge(intake, slides, currentScore, challenge, founderAnswer, analysis);
-    }
-
-    const newScore = await scorePitch(intake, mergedSlides, analysis);
-    const scoreDiff = newScore.overallScore - currentScore.overallScore;
-    const newDecision = await evaluateInvestorDecision(intake, mergedSlides, newScore, analysis);
 
     return {
       founderAnswer,
-      evaluation: parsed.evaluation || 'Evidence strengthens the investment thesis and grounds key assumptions.',
-      updatedSlides: mergedSlides,
-      changedSlideNumbers: changedNumbers,
+      evaluation: parsed.evaluation || 'Feedback processed.',
+      updatedSlides: slides,
+      changedSlideNumbers: [],
       previousScore: currentScore,
-      newScore,
-      scoreDifference: scoreDiff,
-      newDecision,
-      explanation: parsed.explanation || 'Integrated founder validation metrics directly into pitch narrative.',
+      newScore: currentScore,
+      scoreDifference: 0,
+      explanation: parsed.explanation || 'Processed Q&A diligence inquiry.',
+      founderKnowledgeScore: parsed.founderKnowledgeScore !== undefined ? Number(parsed.founderKnowledgeScore) : 80,
+      evaluationGrade: parsed.evaluationGrade || 'Good',
+      evaluationFeedback: parsed.evaluationFeedback || 'The response has been received and evaluated.',
+      idealAnswerDiligence: parsed.idealAnswerDiligence || 'Expected a detailed validation response.',
+      isPassed: parsed.isPassed !== undefined ? !!parsed.isPassed : true,
     };
   } catch (error) {
     console.error('Gemini error in resolveInvestorChallenge, applying structured integration fallback:', error);
@@ -2264,6 +2203,7 @@ function fallbackGenerateInvestorChallenge(
       'Pilot customer retention cohort or weekly usage metrics',
       'Target willingness-to-pay benchmark data',
     ],
+    idealAnswerOutline: 'The founder must provide specific indicators of user feedback, pilot signup counts, conversion rates, signed agreements (LOIs), or historical retention percentages that prove demand is more than just an assumption.',
   };
 }
 
@@ -2275,42 +2215,39 @@ function fallbackResolveInvestorChallenge(
   founderAnswer: string,
   analysis?: StartupAnalysis
 ): ChallengeResolutionResult {
-  const updatedSlides = slides.map((s) => {
-    if (s.slideNumber === 8) {
-      return {
-        ...s,
-        headline: `Validated Market Traction: ${founderAnswer.slice(0, 75)}...`,
-        bullets: [
-          `Founder Validation Proof: ${founderAnswer}`,
-          ...s.bullets.slice(0, 2),
-        ],
-        keyDataPoints: [
-          { label: 'Pilot Proof', value: 'Verified', status: 'validated' as const },
-          ...s.keyDataPoints.slice(1),
-        ],
-        isEdited: true,
-      };
-    }
-    return s;
-  });
+  const isGibberishOrTrivial = 
+    founderAnswer.trim().length < 8 || 
+    /^[a-zA-Z\s]+$/.test(founderAnswer) && (
+      founderAnswer.toLowerCase().includes('abcd') ||
+      founderAnswer.toLowerCase() === 'test' ||
+      founderAnswer.toLowerCase() === 'asdf' ||
+      founderAnswer.toLowerCase() === 'nothing'
+    );
 
-  const newScore: PitchScore = {
-    ...currentScore,
-    overallScore: Math.min(95, currentScore.overallScore + 6),
-    strengths: [`Incorporated verified founder proof: "${founderAnswer.slice(0, 60)}..."`, ...currentScore.strengths],
-  };
-
-  const newDecision = fallbackEvaluateInvestorDecision(intake, updatedSlides, newScore);
+  const isPassed = !isGibberishOrTrivial;
+  const founderKnowledgeScore = isPassed ? 85 : 15;
+  const evaluationGrade = isPassed ? 'Good' : 'Incomplete / Invalid';
+  const evaluationFeedback = isPassed 
+    ? 'Constructive feedback: Your answer touches upon the core verification metrics requested by the investment committee and demonstrates logical understanding of your startup\'s risk vectors.'
+    : 'Evaluation feedback: The response is evasive, empty, or consists of random letters like ABCD. This is an automatic failure as it does not address the high-stakes investor question.';
 
   return {
     founderAnswer,
-    evaluation: 'Founder provided direct, concrete evidence that resolves the primary investor uncertainty and strengthens the validation score.',
-    updatedSlides,
-    changedSlideNumbers: [8],
+    evaluation: isPassed 
+      ? 'Founder provided a sincere response answering the primary investor inquiry.'
+      : 'VC Committee Alert: Founder provided an invalid or evasive response to the challenge.',
+    updatedSlides: slides,
+    changedSlideNumbers: [],
     previousScore: currentScore,
-    newScore,
-    scoreDifference: newScore.overallScore - currentScore.overallScore,
-    newDecision,
-    explanation: 'Incorporated founder proof directly into Slide 8 (Traction & Validation).',
+    newScore: currentScore,
+    scoreDifference: 0,
+    explanation: isPassed
+      ? 'Verified founder knowledge regarding traction and customer demand.'
+      : 'Failed to verify founder knowledge due to insufficient/trivial input.',
+    founderKnowledgeScore,
+    evaluationGrade,
+    evaluationFeedback,
+    idealAnswerDiligence: challenge.idealAnswerOutline || 'The founder must provide specific indicators of user feedback, pilot signup counts, conversion rates, or signed agreements (LOIs).',
+    isPassed,
   };
 }

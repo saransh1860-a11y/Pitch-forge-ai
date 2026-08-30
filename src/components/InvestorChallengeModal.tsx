@@ -247,45 +247,119 @@ export const InvestorChallengeModal: React.FC<InvestorChallengeModalProps> = ({
         {/* Resolution Outcome State */}
         {resolutionResult && (
           <div className="space-y-5 animate-in fade-in zoom-in-95 duration-200">
-            <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-5 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                  <CheckCircle2 className="h-4 w-4" /> Evidence Evaluated & Integrated
-                </span>
-                <span className="rounded bg-emerald-500/20 text-emerald-300 font-black px-2.5 py-1 text-xs border border-emerald-500/30">
-                  {resolutionResult.scoreDifference >= 0 ? `+${resolutionResult.scoreDifference} PTS` : `${resolutionResult.scoreDifference} PTS`}
-                </span>
-              </div>
+            {/* Emerald/Green Card for Successful Verification */}
+            {(!resolutionResult.hasOwnProperty('isPassed') || resolutionResult.isPassed) ? (
+              <div className="rounded-2xl border border-emerald-500/40 bg-gradient-to-br from-emerald-950/20 via-zinc-900 to-zinc-950 p-5 space-y-4 shadow-xl">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                    <CheckCircle2 className="h-4 w-4" /> Founder Knowledge Verified
+                  </span>
+                  <span className="rounded bg-emerald-500/20 text-emerald-300 font-black px-3 py-1 text-sm border border-emerald-500/30">
+                    SCORE: {resolutionResult.founderKnowledgeScore !== undefined ? resolutionResult.founderKnowledgeScore : 85}/100 ({resolutionResult.evaluationGrade || 'Good'})
+                  </span>
+                </div>
 
-              <p className="text-xs sm:text-sm text-zinc-200 font-medium leading-relaxed">
-                {resolutionResult.evaluation}
-              </p>
+                <div className="space-y-3">
+                  <p className="text-sm font-semibold text-white leading-relaxed">
+                    {resolutionResult.evaluation}
+                  </p>
 
-              <div className="pt-2 border-t border-emerald-500/20 flex items-center justify-between text-xs">
-                <span className="text-zinc-300">
-                  Score Evolution: <strong>{resolutionResult.previousScore.overallScore}</strong> → <strong className="text-emerald-400">{resolutionResult.newScore.overallScore}/100</strong>
-                </span>
-                <span className="text-zinc-400">
-                  Updated Slide(s): {resolutionResult.changedSlideNumbers.join(', ')}
-                </span>
+                  <div className="rounded-xl bg-zinc-900/60 p-3.5 border border-zinc-800 space-y-1.5">
+                    <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest block">
+                      Investor Feedback
+                    </span>
+                    <p className="text-xs text-zinc-300 leading-relaxed">
+                      {resolutionResult.evaluationFeedback || 'Your answer successfully addresses the core meaning of the investment criteria.'}
+                    </p>
+                  </div>
+
+                  {resolutionResult.idealAnswerDiligence && (
+                    <div className="rounded-xl bg-zinc-900/40 p-3.5 border border-zinc-800/80 space-y-1.5">
+                      <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">
+                        Diligence Standard (Answer in Mind)
+                      </span>
+                      <p className="text-xs text-zinc-400 italic leading-relaxed">
+                        {resolutionResult.idealAnswerDiligence}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-3 border-t border-zinc-800 flex items-center justify-between text-[11px] text-zinc-400">
+                  <span>
+                    Pitch Deck Quality: <strong className="text-zinc-300">{resolutionResult.previousScore.overallScore}/100</strong> (unchanged)
+                  </span>
+                  <span>
+                    Status: <strong className="text-emerald-400">PASSED</strong>
+                  </span>
+                </div>
               </div>
-            </div>
+            ) : (
+              /* Rose/Red Card for Failed Verification (gibberish/ABCD) */
+              <div className="rounded-2xl border border-rose-500/40 bg-gradient-to-br from-rose-950/20 via-zinc-900 to-zinc-950 p-5 space-y-4 shadow-xl">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
+                    <ShieldAlert className="h-4 w-4" /> Knowledge Verification Failed
+                  </span>
+                  <span className="rounded bg-rose-500/20 text-rose-300 font-black px-3 py-1 text-sm border border-rose-500/30">
+                    SCORE: {resolutionResult.founderKnowledgeScore || 0}/100 ({resolutionResult.evaluationGrade || 'Invalid'})
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-sm font-semibold text-white leading-relaxed">
+                    {resolutionResult.evaluation}
+                  </p>
+
+                  <div className="rounded-xl bg-zinc-900/60 p-3.5 border border-zinc-800 space-y-1.5">
+                    <span className="text-[10px] font-black text-rose-400 uppercase tracking-widest block">
+                      Investor Rejection Feedback
+                    </span>
+                    <p className="text-xs text-zinc-300 leading-relaxed">
+                      {resolutionResult.evaluationFeedback}
+                    </p>
+                  </div>
+
+                  {resolutionResult.idealAnswerDiligence && (
+                    <div className="rounded-xl bg-zinc-900/40 p-3.5 border border-zinc-800/80 space-y-1.5">
+                      <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block">
+                        Diligence Standard (Answer in Mind)
+                      </span>
+                      <p className="text-xs text-zinc-400 italic leading-relaxed">
+                        {resolutionResult.idealAnswerDiligence}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-3 border-t border-zinc-800 flex items-center justify-between text-[11px] text-zinc-400">
+                  <span>
+                    Pitch Deck Quality: <strong className="text-zinc-300">{resolutionResult.previousScore.overallScore}/100</strong> (unchanged)
+                  </span>
+                  <span>
+                    Status: <strong className="text-rose-400">FAILED</strong>
+                  </span>
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={onClose}
-                className="rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 px-4 py-2 text-xs font-semibold text-zinc-300"
+                className="rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 px-4 py-2 text-xs font-semibold text-zinc-300 transition-colors"
               >
-                Discard
+                Discard & Close
               </button>
-              <button
-                onClick={handleApplyAndClose}
-                className="flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold px-5 py-2 text-xs sm:text-sm shadow-lg shadow-emerald-500/25 transition-all"
-              >
-                <FileCheck className="h-4 w-4" />
-                <span>Apply Proof to Pitch Deck</span>
-                <ArrowRight className="h-4 w-4" />
-              </button>
+              {(!resolutionResult.hasOwnProperty('isPassed') || resolutionResult.isPassed) && (
+                <button
+                  onClick={handleApplyAndClose}
+                  className="flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold px-5 py-2 text-xs sm:text-sm shadow-lg shadow-emerald-500/25 transition-all"
+                >
+                  <FileCheck className="h-4 w-4" />
+                  <span>Record Verified Diligence</span>
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              )}
             </div>
           </div>
         )}

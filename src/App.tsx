@@ -438,19 +438,20 @@ function AppContent() {
   const handleApplyChallengeResolution = async (result: ChallengeResolutionResult) => {
     if (!activeProject) return;
     const nextVersionNum = activeProject.currentVersion + 1;
-    const deltaVal = result.scoreDifference || 0;
     const challengeTitle = activeProject.lastChallenge?.title || activeProject.lastChallenge?.category || 'Investor Challenge Resolved';
+    const gradeString = result.evaluationGrade ? ` (${result.evaluationGrade})` : '';
+    const scoreString = result.founderKnowledgeScore !== undefined ? ` [Knowledge Score: ${result.founderKnowledgeScore}/100]` : '';
 
     const newVersion: PitchVersion = {
       versionId: `v${nextVersionNum}-${Date.now()}`,
       versionNumber: nextVersionNum,
       createdAt: new Date().toISOString(),
-      note: `Challenge Resolved: ${challengeTitle} (+${deltaVal} pts)`,
+      note: `Challenge Verified: ${challengeTitle}${scoreString}${gradeString}`,
       slides: result.updatedSlides,
       score: result.newScore,
       decision: result.newDecision,
       changedSlideNumbers: result.changedSlideNumbers,
-      whatChanged: [result.evaluation, result.explanation],
+      whatChanged: [result.evaluation, result.explanation, result.evaluationFeedback || ''].filter(Boolean),
       analysis: activeProject.analysis,
     };
 
@@ -463,6 +464,10 @@ function AppContent() {
       }),
       status: 'resolved' as const,
       resolutionSummary: result.explanation,
+      founderResponse: result.founderAnswer,
+      founderKnowledgeScore: result.founderKnowledgeScore,
+      evaluationGrade: result.evaluationGrade,
+      evaluationFeedback: result.evaluationFeedback,
     };
 
     const updatedProject: PitchProject = {
