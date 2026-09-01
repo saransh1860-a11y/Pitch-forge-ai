@@ -214,6 +214,7 @@ export interface PitchProject {
   lastAgentResult?: AutonomousImprovementResult;
   lastChallenge?: InvestorChallenge;
   status: 'draft' | 'analyzed' | 'generated' | 'critiqued' | 'refined';
+  isShared?: boolean;
 }
 
 export type AppWorkflowStep = 

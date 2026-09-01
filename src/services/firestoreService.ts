@@ -7,6 +7,7 @@ import {
   where,
   onSnapshot,
   getDocs,
+  getDoc,
 } from 'firebase/firestore';
 import { db, auth, handleFirestoreError, OperationType } from '../firebase';
 import { PitchProject } from '../types/pitch';
@@ -82,6 +83,7 @@ export function subscribeUserProjects(
             lastAgentResult: data.lastAgentResult || undefined,
             lastChallenge: data.lastChallenge || undefined,
             status: data.status || 'draft',
+            isShared: data.isShared || false,
           });
         });
 
@@ -124,6 +126,7 @@ export async function saveProjectToFirestore(
       versions: project.versions || [],
       createdAt: project.createdAt || new Date().toISOString(),
       updatedAt: project.updatedAt || new Date().toISOString(),
+      isShared: project.isShared || false,
     };
 
     if (project.analysis) {
@@ -193,6 +196,7 @@ export async function fetchUserProjects(userId: string): Promise<PitchProject[]>
         lastAgentResult: data.lastAgentResult || undefined,
         lastChallenge: data.lastChallenge || undefined,
         status: data.status || 'draft',
+        isShared: data.isShared || false,
       });
     });
 
@@ -201,5 +205,39 @@ export async function fetchUserProjects(userId: string): Promise<PitchProject[]>
   } catch (error) {
     console.error('Error fetching user projects:', error);
     handleFirestoreError(error, OperationType.LIST, path);
+  }
+}
+
+/**
+ * Fetch a single pitch project by its ID (for public view).
+ */
+export async function fetchProjectById(projectId: string): Promise<PitchProject | null> {
+  const path = 'projects';
+  try {
+    const docRef = doc(db, path, projectId);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) return null;
+    const data = docSnap.data() as any;
+    return {
+      id: data.id || docSnap.id,
+      createdAt: data.createdAt || new Date().toISOString(),
+      updatedAt: data.updatedAt || new Date().toISOString(),
+      intake: data.intake || { startupName: data.startupName || 'Untitled Startup' },
+      analysis: data.analysis || undefined,
+      slides: Array.isArray(data.slides) ? data.slides : [],
+      currentVersion: typeof data.currentVersion === 'number' ? data.currentVersion : 1,
+      versions: Array.isArray(data.versions) ? data.versions : [],
+      score: data.score || undefined,
+      critique: data.critique || undefined,
+      decision: data.decision || undefined,
+      lastAgentResult: data.lastAgentResult || undefined,
+      lastChallenge: data.lastChallenge || undefined,
+      status: data.status || 'draft',
+      isShared: data.isShared || false,
+    };
+  } catch (error) {
+    console.error('Error fetching single project by ID:', error);
+    handleFirestoreError(error, OperationType.GET, path);
+    return null;
   }
 }

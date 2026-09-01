@@ -47,12 +47,14 @@ service cloud.firestore {
         && (!('critique' in data) || data.critique == null || data.critique is map)
         && (!('decision' in data) || data.decision == null || data.decision is map)
         && (!('lastAgentResult' in data) || data.lastAgentResult == null || data.lastAgentResult is map)
-        && (!('lastChallenge' in data) || data.lastChallenge == null || data.lastChallenge is map);
+        && (!('lastChallenge' in data) || data.lastChallenge == null || data.lastChallenge is map)
+        && (!('isShared' in data) || data.isShared == null || data.isShared is bool);
     }
 
     // Projects collection
     match /projects/{projectId} {
-      allow read: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow read: if (resource != null && 'isShared' in resource.data && resource.data.isShared == true)
+        || (isSignedIn() && resource.data.ownerId == request.auth.uid);
       
       allow create: if isSignedIn()
         && isValidId(projectId)

@@ -29,9 +29,11 @@ import {
   MessageSquare,
   Bot,
   RefreshCw,
+  Share2,
 } from 'lucide-react';
 import { SlideData, PitchProject } from '../types/pitch';
 import { improveSlideApi } from '../services/apiClient';
+import { ShareModal } from './ShareModal';
 
 interface PitchDeckStudioProps {
   project: PitchProject;
@@ -41,6 +43,7 @@ interface PitchDeckStudioProps {
   onOpenHistory: () => void;
   onOpenExport: () => void;
   onOpenPresentation: () => void;
+  onToggleShare: (isShared: boolean) => Promise<void>;
   onOpenChallenge?: () => void;
   onOpenBeforeAfter?: () => void;
   onRunAutonomousImprove?: () => void;
@@ -57,6 +60,7 @@ export const PitchDeckStudio: React.FC<PitchDeckStudioProps> = ({
   onOpenHistory,
   onOpenExport,
   onOpenPresentation,
+  onToggleShare,
   onOpenChallenge,
   onOpenBeforeAfter,
   onRunAutonomousImprove,
@@ -67,6 +71,7 @@ export const PitchDeckStudio: React.FC<PitchDeckStudioProps> = ({
   const [selectedSlideIndex, setSelectedSlideIndex] = useState(0);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [customAiPrompt, setCustomAiPrompt] = useState('');
+  const [showShareModal, setShowShareModal] = useState(false);
   
   // Pending AI Diff State for approval
   const [pendingDiff, setPendingDiff] = useState<{
@@ -264,6 +269,16 @@ export const PitchDeckStudio: React.FC<PitchDeckStudioProps> = ({
           >
             <Presentation className="h-3.5 w-3.5 text-indigo-400" />
             <span className="hidden sm:inline">Present</span>
+          </button>
+
+          {/* Share Button */}
+          <button
+            onClick={() => setShowShareModal(true)}
+            className="flex items-center gap-1.5 rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 px-3 py-2 text-xs font-semibold text-zinc-200 transition-all active:scale-95"
+            title="Generate a public read-only link for mentors & partners"
+          >
+            <Share2 className="h-3.5 w-3.5 text-indigo-400" />
+            <span>Share</span>
           </button>
 
           {/* Export */}
@@ -670,6 +685,15 @@ export const PitchDeckStudio: React.FC<PitchDeckStudioProps> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Share Link Settings Dialog */}
+      {showShareModal && (
+        <ShareModal
+          project={project}
+          onToggleShare={onToggleShare}
+          onClose={() => setShowShareModal(false)}
+        />
       )}
     </div>
   );

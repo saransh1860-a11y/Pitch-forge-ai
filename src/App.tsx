@@ -34,7 +34,9 @@ import {
   subscribeUserProjects,
   saveProjectToFirestore,
   deleteProjectFromFirestore,
+  fetchProjectById,
 } from './services/firestoreService';
+import { SharedPitchView } from './components/SharedPitchView';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 import { Navbar } from './components/Navbar';
@@ -59,6 +61,8 @@ function AppContent() {
   const { user, isAnonymous, setSyncStatus } = useAuth();
   const [projects, setProjects] = useState<PitchProject[]>([]);
   const [activeProject, setActiveProject] = useState<PitchProject | null>(null);
+  const [sharedProject, setSharedProject] = useState<PitchProject | null>(null);
+  const [isLoadingShared, setIsLoadingShared] = useState(false);
 
   const [currentView, setCurrentView] = useState<
     'dashboard' | 'intake' | 'analysis' | 'studio' | 'score' | 'critique'
@@ -79,6 +83,48 @@ function AppContent() {
   const [showAgentRevisionModal, setShowAgentRevisionModal] = useState(false);
   const [agentRevisionResult, setAgentRevisionResult] = useState<AutonomousImprovementResult | null>(null);
   const [isAgentImproving, setIsAgentImproving] = useState(false);
+
+  // Load shared project if present in URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const shareId = params.get('share') || params.get('shared');
+    if (shareId) {
+      setIsLoadingShared(true);
+      fetchProjectById(shareId)
+        .then((project) => {
+          if (project) {
+            setSharedProject(project);
+          } else {
+            setErrorMessage('The shared pitch deck link is invalid, restricted, or expired.');
+          }
+        })
+        .catch((err) => {
+          console.error('Error fetching shared project:', err);
+          setErrorMessage('Could not load the shared pitch deck.');
+        })
+        .finally(() => {
+          setIsLoadingShared(false);
+        });
+    }
+  }, []);
+
+  const handleCloseSharedView = () => {
+    setSharedProject(null);
+    const newUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  };
+
+  const handleToggleShare = async (isShared: boolean) => {
+    if (!activeProject) return;
+    const updatedProject: PitchProject = {
+      ...activeProject,
+      isShared,
+      updatedAt: new Date().toISOString(),
+    };
+    setActiveProject(updatedProject);
+    setProjects((prev) => prev.map((p) => p.id === updatedProject.id ? updatedProject : p));
+    await persistProject(updatedProject);
+  };
 
   // Synchronize projects strictly for the authenticated user from Firestore with instant local fallback
   useEffect(() => {
@@ -736,6 +782,7 @@ function AppContent() {
                 onOpenHistory={() => setShowHistory(true)}
                 onOpenExport={() => setShowExport(true)}
                 onOpenPresentation={() => setShowPresentation(true)}
+                onToggleShare={handleToggleShare}
                 onOpenChallenge={handleOpenChallenge}
                 onOpenBeforeAfter={handleOpenBeforeAfter}
                 onRunAutonomousImprove={handleAutonomousImprove}
