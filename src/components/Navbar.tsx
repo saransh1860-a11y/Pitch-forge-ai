@@ -11,9 +11,12 @@ import {
   CheckCircle2,
   Database,
   CloudCheck,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { PitchProject } from '../types/pitch';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import logoImg from '../assets/images/pitchforge_logo_1788025673462.jpg';
 
 interface NavbarProps {
@@ -34,6 +37,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenPresentation,
 }) => {
   const { user, loading, isAnonymous, syncStatus, signInWithGoogle, signOutUser } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -50,6 +54,8 @@ export const Navbar: React.FC<NavbarProps> = ({
       }
     }
   };
+
+
 
   return (
     <header className="sticky top-0 z-40 border-b border-blue-900/30 bg-[#02040a]/90 backdrop-blur-md">
@@ -215,6 +221,19 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </div>
           )}
+
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+            className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition-colors cursor-pointer"
+          >
+            {theme === 'light' ? (
+              <Sun className="h-4 w-4 text-amber-500" />
+            ) : (
+              <Moon className="h-4 w-4 text-indigo-400" />
+            )}
+          </button>
 
           {/* Settings Button */}
           <button

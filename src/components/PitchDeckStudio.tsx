@@ -34,6 +34,7 @@ import {
 import { SlideData, PitchProject } from '../types/pitch';
 import { improveSlideApi } from '../services/apiClient';
 import { ShareModal } from './ShareModal';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface PitchDeckStudioProps {
   project: PitchProject;
@@ -72,6 +73,7 @@ export const PitchDeckStudio: React.FC<PitchDeckStudioProps> = ({
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [customAiPrompt, setCustomAiPrompt] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
+  const { theme } = useTheme();
   
   // Pending AI Diff State for approval
   const [pendingDiff, setPendingDiff] = useState<{
@@ -164,6 +166,461 @@ export const PitchDeckStudio: React.FC<PitchDeckStudioProps> = ({
       default: return Layers;
     }
   };
+
+  if (theme === 'light') {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 space-y-6 text-slate-900 bg-slate-50 min-h-screen">
+        {/* Studio Top Control Bar - LIGHT MODE */}
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+              <Layers className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-base font-bold text-slate-900">
+                  {project.intake.startupName || 'Pitch Studio'}
+                </h1>
+                <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600 border border-slate-200">
+                  10-Slide Deck • v{project.currentVersion}
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 font-medium">
+                Interactive Pitch Editor & AI Co-Pilot
+              </p>
+            </div>
+          </div>
+
+          {/* Action Buttons - LIGHT MODE */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* 60-Second Investor Test */}
+            <button
+              onClick={onOpenCritique}
+              disabled={isLoadingCritique}
+              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white px-3.5 py-2 text-xs font-bold shadow-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+              title="Simulate 60-second VC Partner review"
+            >
+              {isLoadingCritique ? (
+                <RefreshCw className="h-3.5 w-3.5 animate-spin text-white" />
+              ) : (
+                <ShieldAlert className="h-3.5 w-3.5 text-white" />
+              )}
+              <span>60-Second Test</span>
+            </button>
+
+            {/* AI Score Button */}
+            <button
+              onClick={onScorePitch}
+              disabled={isLoadingScore}
+              className="flex items-center gap-1.5 rounded-xl border border-indigo-100 bg-indigo-50/50 hover:bg-indigo-50 px-3 py-2 text-xs font-bold text-indigo-700 transition-all active:scale-95 cursor-pointer"
+            >
+              {isLoadingScore ? (
+                <RefreshCw className="h-3.5 w-3.5 animate-spin text-indigo-600" />
+              ) : (
+                <Award className="h-3.5 w-3.5 text-indigo-600" />
+              )}
+              <span>
+                {project.score ? `Score: ${project.score.overallScore}/100` : 'Scorecard'}
+              </span>
+            </button>
+
+            {/* Investor Challenge */}
+            {onOpenChallenge && (
+              <button
+                onClick={onOpenChallenge}
+                className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 transition-all active:scale-95 cursor-pointer"
+                title="Test against hard VC due-diligence questions"
+              >
+                <HelpCircle className="h-3.5 w-3.5 text-amber-500" />
+                <span className="hidden sm:inline">Challenge</span>
+              </button>
+            )}
+
+            {/* Before vs After Comparison */}
+            {onOpenBeforeAfter && (
+              <button
+                onClick={onOpenBeforeAfter}
+                className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 transition-all active:scale-95 cursor-pointer"
+                title="Compare initial founder draft against AI revisions"
+              >
+                <Layers className="h-3.5 w-3.5 text-indigo-600" />
+                <span className="hidden sm:inline">Before/After</span>
+              </button>
+            )}
+
+            {/* Revise with AI Investor */}
+            {onRunAutonomousImprove && (
+              <button
+                onClick={onRunAutonomousImprove}
+                disabled={isImprovingDeck}
+                className="flex items-center gap-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 text-xs font-bold shadow-sm transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                title="Let AI Investor agent identify weak slides"
+              >
+                {isImprovingDeck ? (
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin text-white" />
+                ) : (
+                  <Sparkles className="h-3.5 w-3.5 text-white" />
+                )}
+                <span>{isImprovingDeck ? 'Revising...' : 'Revise Deck (AI)'}</span>
+              </button>
+            )}
+
+            {/* Present Button */}
+            <button
+              onClick={onOpenPresentation}
+              className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 transition-all active:scale-95 cursor-pointer"
+            >
+              <Presentation className="h-3.5 w-3.5 text-indigo-600" />
+              <span className="hidden sm:inline">Present</span>
+            </button>
+
+            {/* Share Button */}
+            <button
+              onClick={() => setShowShareModal(true)}
+              className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 transition-all active:scale-95 cursor-pointer"
+            >
+              <Share2 className="h-3.5 w-3.5 text-indigo-600" />
+              <span>Share</span>
+            </button>
+
+            {/* Export */}
+            <button
+              onClick={onOpenExport}
+              className="flex items-center gap-1.5 rounded-xl bg-white hover:bg-slate-50 px-3 py-2 text-xs font-bold text-slate-700 border border-slate-200 transition-colors cursor-pointer"
+            >
+              <Download className="h-3.5 w-3.5 text-emerald-600" />
+              <span>Export</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Main Studio Grid: Left Navigator (25%), Center Editor (45%), Right AI Assistant (30%) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* 1. LEFT SIDEBAR: 10 Slides Navigator */}
+          <div className="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-4 space-y-2 shadow-sm">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                10-Slide Outline
+              </span>
+              <span className="text-[10px] text-indigo-600 font-bold">Standard Flow</span>
+            </div>
+
+            <div className="space-y-1.5 max-h-[680px] overflow-y-auto pr-1">
+              {project.slides.map((slide, idx) => {
+                const Icon = getCategoryIcon(slide.category);
+                const isSelected = idx === selectedSlideIndex;
+
+                return (
+                  <button
+                    key={slide.id || idx}
+                    onClick={() => setSelectedSlideIndex(idx)}
+                    className={`w-full text-left flex items-start gap-3 rounded-xl p-2.5 transition-all ${
+                      isSelected
+                        ? 'bg-indigo-50 border border-indigo-200 text-indigo-900 shadow-sm'
+                        : 'hover:bg-slate-50 text-slate-600 border border-transparent'
+                    }`}
+                  >
+                    <div
+                      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
+                        isSelected
+                          ? 'bg-indigo-600 text-white shadow'
+                          : 'bg-slate-100 text-slate-500 border border-slate-200'
+                      }`}
+                    >
+                      {idx + 1}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className={`text-xs font-bold truncate ${isSelected ? 'text-indigo-900' : 'text-slate-800'}`}>
+                          {slide.title}
+                        </span>
+                        <Icon className={`h-3 w-3 shrink-0 ${isSelected ? 'text-indigo-600' : 'text-slate-400'}`} />
+                      </div>
+                      <p className="text-[10px] text-slate-500 truncate mt-0.5 font-medium">
+                        {slide.headline}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 2. CENTER CANVAS: Slide Preview & Inline Editor */}
+          <div className="lg:col-span-6 space-y-6">
+            {/* Main Slide Card Container */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedSlideIndex}
+                initial={{ opacity: 0, x: 15 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -15 }}
+                transition={{ duration: 0.2 }}
+                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6"
+              >
+                {/* Slide Header */}
+                <div className="space-y-2 border-b border-slate-100 pb-5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+                      Slide {currentSlide.slideNumber} • {currentSlide.category.replace('_', ' ').toUpperCase()}
+                    </span>
+                    {currentSlide.isEdited && (
+                      <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded">
+                        Edited Draft
+                      </span>
+                    )}
+                  </div>
+
+                  <input
+                    type="text"
+                    value={currentSlide.title}
+                    onChange={(e) => handleCurrentSlideChange('title', e.target.value)}
+                    className="w-full bg-transparent text-xl font-bold text-slate-900 border-b border-transparent hover:border-slate-200 focus:border-indigo-500 focus:outline-none transition-colors"
+                    placeholder="Slide Title"
+                  />
+
+                  <input
+                    type="text"
+                    value={currentSlide.headline}
+                    onChange={(e) => handleCurrentSlideChange('headline', e.target.value)}
+                    className="w-full bg-transparent text-sm font-semibold text-slate-600 border-b border-transparent hover:border-slate-200 focus:border-indigo-500 focus:outline-none transition-colors"
+                    placeholder="1-Second Takeaway Headline"
+                  />
+                </div>
+
+                {/* Bullets List Section */}
+                <div className="space-y-3">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+                    Takeaway Arguments & Supporting Points
+                  </label>
+
+                  <div className="space-y-2.5">
+                    {currentSlide.bullets.map((bullet, bIdx) => (
+                      <div key={bIdx} className="flex items-start gap-2 group">
+                        <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-500" />
+                        <textarea
+                          rows={2}
+                          value={bullet}
+                          onChange={(e) => handleBulletChange(bIdx, e.target.value)}
+                          className="flex-1 bg-transparent text-xs text-slate-700 leading-relaxed border-b border-transparent hover:border-slate-200 focus:border-indigo-500 focus:outline-none resize-none transition-colors py-1"
+                          placeholder="Supporting argument point..."
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteBullet(bIdx)}
+                          className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-rose-600 transition-all cursor-pointer"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleAddBullet}
+                    className="flex items-center gap-1 text-[11px] font-bold text-indigo-600 hover:text-indigo-700 transition-colors pt-2 cursor-pointer"
+                  >
+                    <Plus className="h-3 w-3" /> Add Takeaway Bullet
+                  </button>
+                </div>
+
+                {/* Key Data Points Card Section */}
+                {currentSlide.keyDataPoints && currentSlide.keyDataPoints.length > 0 && (
+                  <div className="pt-4 border-t border-slate-100 space-y-3">
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+                      Quantitative Evidence & Milestones
+                    </label>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {currentSlide.keyDataPoints.map((point, pIdx) => (
+                        <div
+                          key={pIdx}
+                          className="rounded-xl border border-slate-200 bg-slate-50/50 p-3 space-y-1 hover:border-slate-300 transition-colors"
+                        >
+                          <input
+                            type="text"
+                            value={point.value}
+                            onChange={(e) => handleDataPointChange(pIdx, 'value', e.target.value)}
+                            className="w-full bg-transparent text-base font-extrabold text-slate-900 border-b border-transparent hover:border-slate-200 focus:border-indigo-500 focus:outline-none transition-colors"
+                            placeholder="e.g. 150k"
+                          />
+                          <input
+                            type="text"
+                            value={point.label}
+                            onChange={(e) => handleDataPointChange(pIdx, 'label', e.target.value)}
+                            className="w-full bg-transparent text-[11px] text-slate-500 border-b border-transparent hover:border-slate-200 focus:border-indigo-500 focus:outline-none transition-colors"
+                            placeholder="e.g. MoM Growth"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* 3. RIGHT SIDEBAR: AI Presentation Co-Pilot */}
+          <div className="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-5 space-y-5 shadow-sm">
+            <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                <Bot className="h-4 w-4" />
+              </div>
+              <h2 className="text-sm font-bold text-slate-900">AI Slide Co-Pilot</h2>
+            </div>
+
+            {/* Quick Actions Panel */}
+            <div className="space-y-2">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                Quick Re-Write Prompts
+              </span>
+
+              <div className="grid grid-cols-1 gap-1.5">
+                <button
+                  onClick={() => handleAiAction('improve')}
+                  disabled={isAiLoading}
+                  className="w-full text-left text-xs font-semibold py-2 px-3 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 transition-all border border-slate-200 cursor-pointer"
+                >
+                  🚀 Optimize for VC Readability
+                </button>
+                <button
+                  onClick={() => handleAiAction('concise')}
+                  disabled={isAiLoading}
+                  className="w-full text-left text-xs font-semibold py-2 px-3 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 transition-all border border-slate-200 cursor-pointer"
+                >
+                  🎯 Make Highly Concise
+                </button>
+                <button
+                  onClick={() => handleAiAction('strengthen_investor_arg')}
+                  disabled={isAiLoading}
+                  className="w-full text-left text-xs font-semibold py-2 px-3 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 transition-all border border-slate-200 cursor-pointer"
+                >
+                  💪 Strengthen Thesis Statement
+                </button>
+                <button
+                  onClick={() => handleAiAction('find_unsupported')}
+                  disabled={isAiLoading}
+                  className="w-full text-left text-xs font-semibold py-2 px-3 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 transition-all border border-slate-200 cursor-pointer"
+                >
+                  🔍 Scan for Weak Hypotheses
+                </button>
+              </div>
+            </div>
+
+            {/* Custom Interactive Command input */}
+            <div className="space-y-2 pt-3 border-t border-slate-100">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                Custom Co-Pilot Directives
+              </label>
+
+              <textarea
+                rows={3}
+                value={customAiPrompt}
+                onChange={(e) => setCustomAiPrompt(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 p-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all resize-none"
+                placeholder="e.g. 'Rewrite this with a focus on enterprise SaaS unit economics...'"
+              />
+
+              <button
+                type="button"
+                onClick={() => handleAiAction('custom')}
+                disabled={isAiLoading || !customAiPrompt.trim()}
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 text-xs shadow-sm shadow-indigo-100 transition-all disabled:opacity-50 cursor-pointer"
+              >
+                {isAiLoading ? (
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Sparkles className="h-3.5 w-3.5" />
+                )}
+                <span>Refine Slide</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* AI Proposal Comparison Overlay Modal - LIGHT MODE */}
+        {pendingDiff && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+            <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
+              <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                  <Sparkles className="h-4.5 w-4.5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">Review Proposed AI Optimizations</h3>
+                  <p className="text-[11px] text-slate-500 font-medium">Verify the revised narrative claims</p>
+                </div>
+              </div>
+
+              {/* Explanation note */}
+              <div className="rounded-xl bg-slate-50 p-3 border border-slate-150 text-xs text-slate-600 leading-relaxed font-medium">
+                {pendingDiff.explanation}
+              </div>
+
+              {/* Diff view Columns */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Original */}
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    Original Founder Slide
+                  </span>
+                  <p className="text-xs font-bold text-slate-800">{currentSlide.headline}</p>
+                  <ul className="text-xs text-slate-600 space-y-1 font-medium">
+                    {currentSlide.bullets.map((b, i) => (
+                      <li key={i}>• {b}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Proposed */}
+                <div className="rounded-xl border border-indigo-150 bg-indigo-50/20 p-4 space-y-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600">
+                    AI Proposed Slide
+                  </span>
+                  <p className="text-xs font-bold text-slate-900">{pendingDiff.improvedSlide.headline}</p>
+                  <ul className="text-xs text-slate-800 space-y-1 font-semibold">
+                    {pendingDiff.improvedSlide.bullets.map((b, i) => (
+                      <li key={i}>• {b}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Decision Bar */}
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={discardAiChanges}
+                  className="rounded-xl border border-slate-200 bg-white hover:bg-slate-50 px-4 py-2.5 text-xs font-bold text-slate-700 cursor-pointer"
+                >
+                  Discard Changes
+                </button>
+                <button
+                  type="button"
+                  onClick={acceptAiChanges}
+                  className="flex items-center gap-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2.5 text-xs shadow-sm cursor-pointer"
+                >
+                  <Check className="h-4 w-4 stroke-[3]" />
+                  Accept AI Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Share Link Settings Dialog */}
+        {showShareModal && (
+          <ShareModal
+            project={project}
+            onToggleShare={onToggleShare}
+            onClose={() => setShowShareModal(false)}
+          />
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 space-y-6">

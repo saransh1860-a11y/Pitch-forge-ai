@@ -1,6 +1,17 @@
 <!doctype html>
 <html lang="en" class="dark">
   <head>
+    <script>
+      (function() {
+        try {
+          const saved = localStorage.getItem('pitchforge-theme') || localStorage.getItem('pitchforge_theme');
+          const theme = saved || 'dark';
+          document.documentElement.className = theme;
+        } catch (e) {
+          console.error('Failed to pre-set theme:', e);
+        }
+      })();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PitchForge AI - From Raw Idea to Investor-Ready Story</title>

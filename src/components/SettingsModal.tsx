@@ -11,7 +11,9 @@ import {
   UserCheck,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import firebaseConfig from '../../firebase-applet-config.json';
+import { Sun, Moon } from 'lucide-react';
 
 interface SettingsModalProps {
   onClose: () => void;
@@ -19,6 +21,7 @@ interface SettingsModalProps {
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
   const { user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [healthStatus, setHealthStatus] = useState<any>(null);
   const [isChecking, setIsChecking] = useState(false);
 
@@ -135,6 +138,37 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                 </p>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Centralized Theme Controller */}
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 space-y-3">
+          <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
+            Interface Theme Preference
+          </span>
+          <div className="flex items-center justify-between bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+            <div className="space-y-0.5">
+              <span className="text-xs font-bold text-white block">Theme Mode</span>
+              <p className="text-[10px] text-zinc-400">
+                Switch between Dark (Investor Night) and Light (Executive Day) modes.
+              </p>
+            </div>
+            <button
+              onClick={toggleTheme}
+              className="flex items-center gap-2 rounded-xl border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-xs px-4 py-2 font-bold cursor-pointer transition-all active:scale-95"
+            >
+              {theme === 'dark' ? (
+                <>
+                  <Sun className="h-4 w-4 text-amber-400" />
+                  <span>Switch to Light</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="h-4 w-4 text-indigo-400" />
+                  <span>Switch to Dark</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>

@@ -1,9 +1,77 @@
 @import "tailwindcss";
 
+:root {
+  /* DARK MODE (DEFAULT PREMIUM IDENTITY) */
+  --bg-primary: #02040A;
+  --bg-secondary: #070B13;
+  --bg-elevated: #0C101B;
+  --surface: #030712;
+  --surface-hover: #171C26;
+
+  --text-primary: #E4E4E7;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+  --text-disabled: #52525B;
+
+  --border: #1E293B;
+  --border-subtle: #0F172A;
+  --border-accent: #D4AF37; /* Metallic Gold */
+
+  --accent: #D4AF37;
+  --accent-hover: #B59020;
+  --accent-soft: rgba(212, 175, 55, 0.1);
+  --accent-border: rgba(212, 175, 55, 0.2);
+
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --info: #3B82F6;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* LIGHT MODE OVERRIDES */
+html.light,
+body.light,
+.light {
+  --bg-primary: #F7F8FA;
+  --bg-secondary: #F1F3F6;
+  --bg-elevated: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-hover: #FAFBFC;
+
+  --text-primary: #111827;
+  --text-secondary: #5B6472;
+  --text-muted: #8A93A3;
+  --text-disabled: #AEB5C0;
+
+  --border: #E5E7EB;
+  --border-subtle: #EEF0F3;
+  --border-accent: #D6B64A;
+
+  --accent: #B58A16;
+  --accent-hover: #946F0D;
+  --accent-soft: #FBF5DF;
+  --accent-border: #E6D59A;
+
+  --success: #16803C;
+  --warning: #B86B00;
+  --error: #C62828;
+  --info: #087EA4;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+}
+
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: #02040a !important;
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
   
   code, pre, kbd {
@@ -11,93 +79,173 @@
   }
 }
 
-/* Custom scrollbars */
+/* System-wide Class Mapping to Theme Variables */
+.bg-zinc-950,
+.bg-zinc-950\/90,
+.bg-zinc-950\/80,
+.bg-zinc-950\/50,
+.bg-\[\#02040a\],
+.bg-\[\#02040a\]\/90 {
+  background-color: var(--bg-primary) !important;
+}
+
+.bg-zinc-900,
+.bg-zinc-900\/40,
+.bg-zinc-900\/60,
+.bg-zinc-900\/80,
+.bg-\[\#030712\],
+.bg-\[\#0c101b\],
+.bg-\[\#070b13\],
+.bg-black {
+  background-color: var(--surface) !important;
+}
+
+.border-zinc-800,
+.border-zinc-800\/80,
+.border-zinc-800\/60,
+.border-zinc-800\/40,
+.border-zinc-700,
+.border-zinc-700\/80,
+.border-blue-900\/30,
+.border-blue-900\/40,
+.border-zinc-900,
+hr {
+  border-color: var(--border) !important;
+}
+
+/* Typography mapping */
+h1, h2, h3, h4, h5, h6, .text-white, .text-zinc-100, .text-zinc-200 {
+  color: var(--text-primary) !important;
+}
+
+.text-zinc-300, .text-zinc-400, .text-zinc-200\/80 {
+  color: var(--text-secondary) !important;
+}
+
+.text-zinc-500, .text-zinc-600 {
+  color: var(--text-muted) !important;
+}
+
+/* Ensure crisp legibility for active buttons and contrast text elements */
+button.text-white,
+button.bg-indigo-600,
+button.bg-indigo-700,
+button.bg-emerald-600,
+button.bg-rose-600,
+.bg-indigo-600,
+.bg-indigo-600 *,
+.bg-indigo-700,
+.bg-indigo-700 *,
+.bg-emerald-600,
+.bg-emerald-600 *,
+.bg-rose-600,
+.bg-rose-600 * {
+  color: #ffffff !important;
+}
+
+/* Brand Button and Highlight Accents Mapping */
+.bg-amber-500,
+.bg-amber-600 {
+  background-color: var(--accent) !important;
+  color: var(--bg-primary) !important; /* Premium dark text contrast on gold background */
+}
+
+.bg-amber-500:hover,
+.bg-amber-600:hover {
+  background-color: var(--accent-hover) !important;
+}
+
+.text-amber-400,
+.text-amber-500 {
+  color: var(--accent) !important;
+}
+
+.border-amber-500\/30,
+.border-amber-500\/20,
+.border-amber-500 {
+  border-color: var(--accent-border) !important;
+}
+
+.bg-amber-500\/10,
+.bg-amber-500\/20 {
+  background-color: var(--accent-soft) !important;
+  color: var(--accent) !important;
+  border-color: var(--accent-border) !important;
+}
+
+/* Status alerts mapped to unified semantic styles */
+.bg-emerald-500\/10, .bg-emerald-500\/20 {
+  background-color: rgba(22, 128, 60, 0.05) !important;
+  color: var(--success) !important;
+  border-color: rgba(22, 128, 60, 0.2) !important;
+}
+
+.bg-rose-500\/10, .bg-rose-500\/20 {
+  background-color: rgba(198, 40, 40, 0.05) !important;
+  color: var(--error) !important;
+  border-color: rgba(198, 40, 40, 0.2) !important;
+}
+
+/* Inputs, Textareas and Dropdowns */
+input, select, textarea {
+  background-color: var(--surface) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border) !important;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px var(--accent-soft) !important;
+}
+
+/* Modals overlays backdrops */
+.bg-black\/80,
+.bg-zinc-950\/80,
+.bg-zinc-950\/95 {
+  background-color: rgba(15, 23, 42, 0.4) !important;
+}
+
+/* Premium Scrollbars integration */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
-
 ::-webkit-scrollbar-track {
-  background: rgba(2, 4, 10, 0.5);
+  background: var(--bg-primary);
 }
-
 ::-webkit-scrollbar-thumb {
-  background: rgba(212, 175, 55, 0.35);
+  background: var(--border);
   border-radius: 9999px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(212, 175, 55, 0.6);
+  background: var(--accent-hover);
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* Precise layout styling for the header in light mode */
+body.light header {
+  background-color: #ffffff !important;
+  border-bottom-color: var(--border) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
-/* Print styles for PDF / deck printing */
+/* Eliminate subpixel rendering artifacts of image logos */
+body.light header img {
+  transform: translateZ(0); /* Force sharp subpixel anti-aliasing */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Print stylesheets preservation */
 @media print {
   @page {
     size: landscape;
     margin: 12mm;
   }
-
   html, body {
     background-color: #ffffff !important;
-    color: #09090b !important;
+    color: #000000 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    width: 100% !important;
-    height: auto !important;
-    overflow: visible !important;
-  }
-
-  /* Hide UI elements on print */
-  header, nav, button, .no-print, [role="dialog"] > div:first-child button {
-    display: none !important;
-  }
-
-  /* Reset modal containers for printable output */
-  .fixed {
-    position: static !important;
-    background: transparent !important;
-    padding: 0 !important;
-  }
-
-  .max-h-96, .max-h-[80vh], .overflow-y-auto, .overflow-hidden {
-    max-height: none !important;
-    overflow: visible !important;
-  }
-
-  /* Page break helpers */
-  .print-page-break {
-    page-break-after: always !important;
-    break-after: page !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  .print-avoid-break {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-  }
-
-  /* Print document container */
-  .pitch-print-container {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 auto !important;
-    background: #ffffff !important;
-    color: #09090b !important;
-  }
-
-  .pitch-print-card {
-    background: #ffffff !important;
-    border: 1.5px solid #d4d4d8 !important;
-    color: #09090b !important;
-    box-shadow: none !important;
   }
 }

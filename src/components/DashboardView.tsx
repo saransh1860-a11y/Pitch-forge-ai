@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { PitchProject } from '../types/pitch';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import logoImg from '../assets/images/pitchforge_logo_1788025673462.jpg';
 
 interface DashboardViewProps {
@@ -37,9 +38,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onDeleteProject,
 }) => {
   const { user, isAnonymous, signInWithGoogle } = useAuth();
+  const { theme } = useTheme();
   const isSignedIn = Boolean(user && !isAnonymous);
 
-  // Compute Dashboard Statistics (only for signed-in users)
+  // Compute Dashboard Statistics
   const totalPitches = projects.length;
   const pitchesGenerated = projects.filter((p) => p.slides && p.slides.length > 0).length;
 
@@ -60,7 +62,415 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       : null;
 
   // --------------------------------------------------------------------------
-  // 1. SIGNED-IN STATE: Full Personalized Dashboard & Recent Pitch Projects
+  // === A. LIGHT MODE COMPONENT RENDERING (REDESIGNED FROM SCRATCH) ===
+  // --------------------------------------------------------------------------
+  if (theme === 'light') {
+    if (isSignedIn) {
+      return (
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-10 bg-slate-50 min-h-screen text-slate-900">
+          {/* Executive Light Hero Header */}
+          <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 sm:p-10 shadow-md">
+            <div className="absolute top-0 right-0 -mt-12 -mr-12 h-96 w-96 rounded-full bg-indigo-50/40 blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/3 -mb-12 h-64 w-64 rounded-full bg-slate-100 blur-3xl pointer-events-none" />
+
+            <div className="relative z-10 max-w-3xl space-y-5">
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                <span>Signed in as {user?.displayName || user?.email || 'Founder'}</span>
+              </div>
+
+              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight">
+                Welcome back,{' '}
+                <span className="text-indigo-600">
+                  {user?.displayName ? user.displayName.split(' ')[0] : 'Founder'}
+                </span>
+              </h1>
+
+              <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal">
+                Manage your investor decks, track VC evaluation scores, and generate new pitches backed by
+                PitchForge AI and Firestore real-time persistence.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <button
+                  onClick={onNewPitch}
+                  className="flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-3 text-sm transition-all shadow-md shadow-indigo-200 active:scale-95 cursor-pointer"
+                >
+                  <Plus className="h-4 w-4 stroke-[3]" />
+                  Create New Pitch
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Clean Statistics Grid */}
+          <motion.div 
+            className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+            }}
+          >
+            {/* Stat Item 1 */}
+            <motion.div 
+              variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+              className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
+                <span>Total Pitches</span>
+                <Layers className="h-4 w-4 text-indigo-500" />
+              </div>
+              <div className="mt-3 flex items-baseline gap-2">
+                <span className="text-2xl sm:text-3xl font-bold text-slate-900">{totalPitches}</span>
+                <span className="text-xs text-slate-500 font-medium">projects</span>
+              </div>
+            </motion.div>
+
+            {/* Stat Item 2 */}
+            <motion.div 
+              variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+              className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
+                <span>Pitches Generated</span>
+                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              </div>
+              <div className="mt-3 flex items-baseline gap-2">
+                <span className="text-2xl sm:text-3xl font-bold text-slate-900">{pitchesGenerated}</span>
+                <span className="text-xs text-slate-500 font-medium font-medium">10-slide decks</span>
+              </div>
+            </motion.div>
+
+            {/* Stat Item 3 */}
+            <motion.div 
+              variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+              className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
+                <span>Avg Investor Score</span>
+                <Award className="h-4 w-4 text-amber-600" />
+              </div>
+              <div className="mt-3 flex items-baseline gap-2">
+                <span className="text-2xl sm:text-3xl font-bold text-amber-600">
+                  {avgScore > 0 ? `${avgScore}/100` : '—'}
+                </span>
+                <span className="text-xs text-slate-500 font-medium font-medium">
+                  {avgScore >= 80 ? 'Seed Ready' : avgScore >= 65 ? 'Pre-Seed' : 'Evaluated'}
+                </span>
+              </div>
+            </motion.div>
+
+            {/* Stat Item 4 */}
+            <motion.div 
+              variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+              className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center justify-between text-slate-500 text-xs font-semibold">
+                <span>Last Edited</span>
+                <Clock className="h-4 w-4 text-rose-500" />
+              </div>
+              <div className="mt-3 truncate">
+                <span className="text-sm font-semibold text-slate-900 truncate block">
+                  {lastEditedProject
+                    ? lastEditedProject.intake.startupName || 'Untitled Pitch'
+                    : 'No projects yet'}
+                </span>
+                <span className="text-xs text-slate-500 font-medium">
+                  {lastEditedProject
+                    ? new Date(lastEditedProject.updatedAt).toLocaleDateString()
+                    : 'Ready to build'}
+                </span>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Pitches List Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900">My Pitch Projects</h2>
+                <p className="text-xs text-slate-500">
+                  Manage, edit, and iterate on your saved investor decks
+                </p>
+              </div>
+              {projects.length > 0 && (
+                <button
+                  onClick={onNewPitch}
+                  className="flex items-center gap-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold px-3.5 py-2 border border-indigo-100 transition-all cursor-pointer"
+                >
+                  <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
+                  New Pitch
+                </button>
+              )}
+            </div>
+
+            {projects.length === 0 ? (
+              <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-white p-10 text-center space-y-4 shadow-sm">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+                  <FileText className="h-7 w-7" />
+                </div>
+                <div className="max-w-md mx-auto space-y-1">
+                  <h3 className="text-base font-semibold text-slate-900">No pitch projects yet</h3>
+                  <p className="text-xs text-slate-500">
+                    Create a new pitch to begin analyzing your market, structuring your 10-slide narrative,
+                    and generating slide decks.
+                  </p>
+                </div>
+                <div className="flex justify-center gap-3 pt-2">
+                  <button
+                    onClick={onNewPitch}
+                    className="rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 text-xs shadow-md shadow-indigo-100 cursor-pointer"
+                  >
+                    + Create First Pitch
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <motion.div 
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: { opacity: 0 },
+                  visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+                }}
+              >
+                {projects.map((project) => {
+                  const hasScore = project.score?.overallScore !== undefined;
+                  const hasSlides = project.slides && project.slides.length > 0;
+                  const score = project.score?.overallScore || 0;
+
+                  return (
+                    <motion.div
+                      key={project.id}
+                      onClick={() => onOpenProject(project)}
+                      variants={{ hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0 } }}
+                      whileHover={{ scale: 1.02, translateY: -2 }}
+                      className="group relative flex flex-col justify-between rounded-xl border border-slate-200 bg-white hover:border-indigo-300 p-5 shadow-sm hover:shadow-md transition-all cursor-pointer"
+                    >
+                      <div className="space-y-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <h3 className="text-base font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
+                              {project.intake.startupName || 'Untitled Pitch'}
+                            </h3>
+                            <p className="text-xs text-slate-500 line-clamp-1 font-medium">
+                              {project.intake.tagline ||
+                                project.intake.rawIdea?.slice(0, 70) ||
+                                'Early-stage startup'}
+                            </p>
+                          </div>
+
+                          {hasScore ? (
+                            <div
+                              className={`shrink-0 flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold border ${
+                                score >= 80
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                  : score >= 65
+                                  ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                  : 'bg-rose-50 text-rose-700 border-rose-200'
+                              }`}
+                            >
+                              <Award className="h-3 w-3" />
+                              <span>{score}/100</span>
+                            </div>
+                          ) : (
+                            <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold text-slate-600 border border-slate-200">
+                              {project.status.toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-slate-500">
+                          <span className="rounded bg-slate-100 px-2 py-0.5 border border-slate-200 font-semibold">
+                            {project.intake.stage || 'Idea'}
+                          </span>
+                          {hasSlides && (
+                            <span className="rounded bg-indigo-50 text-indigo-700 px-2 py-0.5 border border-indigo-100 font-semibold">
+                              10 Slides Ready
+                            </span>
+                          )}
+                          <span className="text-slate-400 font-medium">• v{project.currentVersion}</span>
+                        </div>
+
+                        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed font-normal">
+                          {project.analysis?.valueProposition ||
+                            project.intake.problem ||
+                            project.intake.rawIdea ||
+                            'No description provided.'}
+                        </p>
+                      </div>
+
+                      <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                        <span className="text-[11px] text-slate-400 font-medium">
+                          Edited {new Date(project.updatedAt).toLocaleDateString()}
+                        </span>
+
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={(e) => onDeleteProject(project.id, e)}
+                            title="Delete project"
+                            className="rounded p-1.5 text-slate-400 hover:bg-slate-50 hover:text-rose-600 transition-colors"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                          <span className="flex items-center gap-1 font-bold text-indigo-600 group-hover:translate-x-0.5 transition-transform">
+                            Open Studio <ArrowRight className="h-3.5 w-3.5 stroke-[2.5]" />
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Light Landing View for Logged out users
+    return (
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 space-y-16 text-slate-900 bg-slate-50">
+        {/* Light Landing Hero Showcase */}
+        <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 sm:p-14 shadow-md text-center space-y-8">
+          <div className="absolute top-0 right-1/4 -mt-16 h-80 w-80 rounded-full bg-indigo-50/50 blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/4 -mb-16 h-80 w-80 rounded-full bg-slate-50/50 blur-3xl pointer-events-none" />
+
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden mb-2">
+            <img
+              src={logoImg}
+              alt="PitchForge AI Logo"
+              className="h-full w-full object-cover"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+
+          <div className="max-w-3xl mx-auto space-y-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-4 py-1 text-xs font-bold text-indigo-700 animate-pulse">
+              <Sparkles className="h-3.5 w-3.5 text-indigo-600" />
+              <span>AI Pitch Strategist for Founders</span>
+            </div>
+
+            <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 leading-tight">
+              Build a pitch <span className="text-indigo-600">investors understand.</span>
+            </h1>
+
+            <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal">
+              Transform messy, unstructured startup thoughts into an evidence-oriented 10-slide pitch deck
+              with PitchForge AI, quantitative data points, and investor evaluation rubrics.
+            </p>
+          </div>
+
+          {/* Landing Actions Panel */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2 max-w-md mx-auto">
+            <button
+              onClick={onNewPitch}
+              className="w-full sm:w-auto flex items-center justify-center gap-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3.5 text-sm shadow-md shadow-indigo-100 active:scale-95 transition-all cursor-pointer"
+            >
+              <Plus className="h-4 w-4 stroke-[3]" />
+              <span>Create Your Pitch</span>
+            </button>
+
+            <button
+              onClick={signInWithGoogle}
+              className="w-full sm:w-auto flex items-center justify-center gap-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-bold px-6 py-3.5 text-sm border border-slate-300 shadow-sm active:scale-95 transition-all cursor-pointer"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.04 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
+                />
+              </svg>
+              <span>Sign In with Google</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Feature pillars */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-3 shadow-sm">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 border border-amber-200">
+              <Zap className="h-5 w-5" />
+            </div>
+            <h3 className="text-base font-bold text-slate-900">Intake & Thesis</h3>
+            <p className="text-xs text-slate-500 leading-relaxed font-medium">
+              Distill raw, messy startup ideas into clear customer pain points, value propositions, and unfair advantages.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-3 shadow-sm">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-200">
+              <Target className="h-5 w-5" />
+            </div>
+            <h3 className="text-base font-bold text-slate-900">Assumptions & Evidence</h3>
+            <p className="text-xs text-slate-500 leading-relaxed font-medium">
+              Automatically detect unverified market claims and map structured evidence needed before meeting investors.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-3 shadow-sm">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200">
+              <Layers className="h-5 w-5" />
+            </div>
+            <h3 className="text-base font-bold text-slate-900">10-Slide Deck Studio</h3>
+            <p className="text-xs text-slate-500 leading-relaxed font-medium">
+              Structured narrative slides with 1-second takeaway headlines, quantitative data cards, and founder scripts.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-3 shadow-sm">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600 border border-rose-200">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <h3 className="text-base font-bold text-slate-900">60-Second VC Review</h3>
+            <p className="text-xs text-slate-500 leading-relaxed font-medium">
+              Rigorous 7-dimension scoring rubric with partner-level verdict, existential risks, and improvement suggestions.
+            </p>
+          </div>
+        </div>
+
+        {/* Sync panel */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200">
+              <Database className="h-6 w-6" />
+            </div>
+            <div>
+              <h4 className="text-base font-bold text-slate-900">Sync & Save Your Pitches to Firestore</h4>
+              <p className="text-xs text-slate-500 mt-0.5 font-medium">
+                Sign in with your Google account to access your personal dashboard, pitch deck revisions, and PDF exports.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={signInWithGoogle}
+            className="shrink-0 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2.5 text-xs shadow transition-all cursor-pointer"
+          >
+            Connect Google Account
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // --------------------------------------------------------------------------
+  // === B. ORIGINAL DARK MODE COMPONENT RENDERING (UNTOUCHED) ===
   // --------------------------------------------------------------------------
   if (isSignedIn) {
     return (
@@ -91,7 +501,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="flex flex-wrap items-center gap-3 pt-2">
               <button
                 onClick={onNewPitch}
-                className="flex items-center gap-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold px-5 py-3 text-sm transition-all shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer"
+                className="flex items-center gap-2 rounded-xl bg-amber-50 hover:bg-amber-400 text-zinc-950 font-bold px-5 py-3 text-sm transition-all shadow-lg shadow-amber-500/20 active:scale-95 cursor-pointer"
               >
                 <Plus className="h-4 w-4 stroke-[3]" />
                 Create New Pitch
@@ -354,9 +764,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     );
   }
 
-  // --------------------------------------------------------------------------
-  // 2. UNSIGNED STATE: Clean Landing View (No Dashboard & No Recent Pitches)
-  // --------------------------------------------------------------------------
+  // Unsigned landing for Dark Mode
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 space-y-16">
       {/* Hero Presentation */}
