@@ -221,6 +221,15 @@ input:focus, select:focus, textarea:focus {
   background: var(--accent-hover);
 }
 
+/* Utility to hide scrollbars while preserving touch scrollability on mobile */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
 /* Precise layout styling for the header in light mode */
 body.light header {
   background-color: #ffffff !important;

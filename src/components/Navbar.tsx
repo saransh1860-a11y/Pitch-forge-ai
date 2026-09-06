@@ -138,9 +138,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* New Pitch CTA */}
           <button
             onClick={onNewPitch}
-            className="flex items-center gap-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold px-3.5 py-1.5 text-xs transition-all shadow-md shadow-amber-500/20 active:scale-95 cursor-pointer"
+            className="flex items-center gap-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold px-2 sm:px-3 py-1.5 text-xs transition-all shadow-md shadow-amber-500/20 active:scale-95 cursor-pointer whitespace-nowrap"
           >
-            + New Pitch
+            <span>+</span>
+            <span className="hidden sm:inline">New Pitch</span>
+            <span className="inline sm:hidden">New</span>
           </button>
 
           {/* Firebase Auth Controls */}
