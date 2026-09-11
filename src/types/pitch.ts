@@ -135,6 +135,12 @@ export interface AgentTraceStep {
   detail: string;
   badge?: string;
   slideNumbers?: number[];
+  toolName?: string;
+  category?: string;
+  agentRole?: string;
+  inputSummary?: string;
+  outputSummary?: string;
+  durationMs?: number;
 }
 
 export interface AutonomousImprovementResult {
@@ -150,6 +156,16 @@ export interface AutonomousImprovementResult {
   scoreDifference: number;
   outcomeReason: string;
   traceSteps: AgentTraceStep[];
+  toolsUsedSummary?: Record<string, number>;
+  toolActivityStats?: {
+    totalDecisions: number;
+    toolCallsCount: number;
+    slidesModifiedCount: number;
+    verificationsCount: number;
+    rollbacksCount: number;
+  };
+  verificationPassed?: boolean;
+  rollbackOccurred?: boolean;
 }
 
 export interface InvestorChallenge {

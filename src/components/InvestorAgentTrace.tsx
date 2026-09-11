@@ -123,7 +123,7 @@ export const InvestorAgentTrace: React.FC<InvestorAgentTraceProps> = ({
                 return (
                   <div
                     key={step.id || idx}
-                    className={`flex items-start gap-3 rounded-xl border p-3 text-xs transition-all ${
+                    className={`flex items-start gap-3 rounded-xl border p-3.5 text-xs transition-all ${
                       isCompleted
                         ? 'border-zinc-800/80 bg-zinc-900/60 text-zinc-200'
                         : isRejected
@@ -145,23 +145,130 @@ export const InvestorAgentTrace: React.FC<InvestorAgentTraceProps> = ({
                       )}
                     </div>
 
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-bold text-white">{step.title}</span>
+                    <div className="flex-1 space-y-1.5">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-white">{step.title}</span>
+                          {step.toolName && (
+                            <span className="rounded bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-mono font-bold text-amber-300">
+                              TOOL: {step.toolName}
+                            </span>
+                          )}
+                          {step.agentRole && (
+                            <span className="rounded bg-zinc-800 border border-zinc-700 px-2 py-0.5 text-[10px] font-semibold text-zinc-300">
+                              {step.agentRole}
+                            </span>
+                          )}
+                        </div>
+
                         <div className="flex items-center gap-2">
                           {step.badge && (
                             <span className="rounded bg-zinc-800 border border-zinc-700 px-2 py-0.5 text-[10px] font-extrabold text-amber-300">
                               {step.badge}
                             </span>
                           )}
+                          {step.durationMs !== undefined && (
+                            <span className="text-[10px] font-mono text-zinc-500">
+                              {step.durationMs}ms
+                            </span>
+                          )}
                           <span className="text-[10px] text-zinc-500">{step.timestamp}</span>
                         </div>
                       </div>
+
                       <p className="text-zinc-300 leading-relaxed">{step.detail}</p>
+
+                      {(step.inputSummary || step.outputSummary) && (
+                        <div className="mt-1.5 pt-1.5 border-t border-zinc-800/60 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] font-mono bg-zinc-950/40 p-2 rounded-lg">
+                          {step.inputSummary && (
+                            <div className="text-zinc-400 truncate">
+                              <span className="text-amber-400/80 font-bold">IN:</span> {step.inputSummary}
+                            </div>
+                          )}
+                          {step.outputSummary && (
+                            <div className="text-zinc-300 truncate">
+                              <span className="text-emerald-400/80 font-bold">OUT:</span> {step.outputSummary}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
               })}
+            </div>
+          )}
+
+          {/* Tool Activity & Registry Summary Panel */}
+          {result && (
+            <div className="rounded-xl border border-amber-500/30 bg-zinc-900/80 p-4 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 pb-2">
+                <span className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <ShieldCheck className="h-4 w-4 text-amber-400" /> Tool Registry & Interaction Summary
+                </span>
+                <span className="text-[11px] text-zinc-400 font-mono">
+                  Real Backend Tool Execution
+                </span>
+              </div>
+
+              {/* Tool Execution Checklist */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                {[
+                  'inspect_deck',
+                  'score_deck',
+                  'inspect_evidence',
+                  'revise_slide',
+                  'compare_decks',
+                  'verify_revision',
+                  'rollback_revision',
+                ].map((toolName) => {
+                  const usedCount = result.toolsUsedSummary?.[toolName] || 0;
+                  const isUsed = usedCount > 0;
+                  return (
+                    <div
+                      key={toolName}
+                      className={`flex items-center justify-between rounded-lg border px-2.5 py-1.5 font-mono text-[11px] ${
+                        isUsed
+                          ? 'border-amber-500/30 bg-amber-500/10 text-amber-300'
+                          : 'border-zinc-800/60 bg-zinc-950/30 text-zinc-600'
+                      }`}
+                    >
+                      <span className="truncate">{toolName}</span>
+                      <span className="font-extrabold ml-1">
+                        {isUsed ? `✓ (${usedCount})` : '—'}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Execution Metrics Bar */}
+              {result.toolActivityStats && (
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1 text-center font-mono">
+                  <div className="rounded-lg bg-zinc-950 border border-zinc-800 p-2">
+                    <span className="block text-[10px] text-zinc-500 uppercase">Decisions</span>
+                    <span className="text-xs font-black text-amber-400">{result.toolActivityStats.totalDecisions}</span>
+                  </div>
+                  <div className="rounded-lg bg-zinc-950 border border-zinc-800 p-2">
+                    <span className="block text-[10px] text-zinc-500 uppercase">Tool Calls</span>
+                    <span className="text-xs font-black text-amber-400">{result.toolActivityStats.toolCallsCount}</span>
+                  </div>
+                  <div className="rounded-lg bg-zinc-950 border border-zinc-800 p-2">
+                    <span className="block text-[10px] text-zinc-500 uppercase">Slides Modified</span>
+                    <span className="text-xs font-black text-amber-400">{result.toolActivityStats.slidesModifiedCount}</span>
+                  </div>
+                  <div className="rounded-lg bg-zinc-950 border border-zinc-800 p-2">
+                    <span className="block text-[10px] text-zinc-500 uppercase">Verifications</span>
+                    <span className="text-xs font-black text-emerald-400">{result.toolActivityStats.verificationsCount}</span>
+                  </div>
+                  <div className="rounded-lg bg-zinc-950 border border-zinc-800 p-2">
+                    <span className="block text-[10px] text-zinc-500 uppercase">Rollbacks</span>
+                    <span className={`text-xs font-black ${result.toolActivityStats.rollbacksCount > 0 ? 'text-rose-400' : 'text-zinc-500'}`}>
+                      {result.toolActivityStats.rollbacksCount}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

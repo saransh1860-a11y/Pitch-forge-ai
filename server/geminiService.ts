@@ -43,7 +43,7 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, timeoutMsg: stri
  * Fast & resilient execution wrapper: calls Gemini with timeout protection and fast fallback.
  * Uses gemini-3.7-flash as the ultra-fast primary model and bounds request duration to prevent UI freezing.
  */
-async function callGeminiWithRetry(options: {
+export async function callGeminiWithRetry(options: {
   contents: any;
   config?: any;
   preferredModel?: string;
@@ -1206,9 +1206,11 @@ export function isDeckIdentical(deckA: SlideData[], deckB: SlideData[]): boolean
   return true;
 }
 
+import { runAgentToolLoop } from './agentEngine';
+
 /**
  * 8. Closed-Loop Autonomous Investor Improvement Agent
- * Executes: Read -> Detect Bottleneck -> Plan Strategy -> Selectively Revise -> Re-Evaluate -> Compare & Verify
+ * Delegates to the stateful, bounded tool-using agent engine
  */
 export async function runAutonomousImprovementLoop(
   intake: StartupIntake,
@@ -1218,10 +1220,13 @@ export async function runAutonomousImprovementLoop(
   decision?: InvestorDecision,
   analysis?: StartupAnalysis
 ): Promise<AutonomousImprovementResult> {
-  const getNow = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  const traceSteps: AgentTraceStep[] = [];
+  return runAgentToolLoop(intake, currentSlides, currentScore, critique, decision, analysis);
+}
 
-  // Step 1: Read Context
+/*
+// Legacy fallback helper for normalizing slide selection
+function legacyUnusedLoop(intake: any, currentSlides: any, currentScore: any, critique: any, decision: any, analysis: any) {
+
   traceSteps.push({
     id: 'step-1',
     timestamp: getNow(),
